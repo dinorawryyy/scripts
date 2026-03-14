@@ -1079,4 +1079,3 @@ ExecuteButton.MouseButton1Click:Connect(function()
                         "[DinoScripts] Manual trade function fixed")
                         print(
                         "[DinoScripts] Made by Dino")
-`
