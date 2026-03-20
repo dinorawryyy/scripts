@@ -1,0 +1,314 @@
+-- DinoScripts Auto Grab UI
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local TweenService = game:GetService("TweenService")
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local VirtualInputManager = game:GetService("VirtualInputManager")
+local Workspace = game:GetService("Workspace")
+
+-- Platform detection
+local isMobile = UserInputService.TouchEnabled
+local isConsole = UserInputService.GamepadEnabled
+local platform = isMobile and "Mobile" or (isConsole and "Console" or "PC")
+
+-- UI Creation
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "DinoScriptsAutoGrabUI"
+ScreenGui.Parent = game.CoreGui
+
+-- Main UI Frame
+local MainFrame = Instance.new("Frame")
+MainFrame.Name = "MainFrame"
+MainFrame.Size = UDim2.new(0, 350, 0, 250)
+MainFrame.Position = UDim2.new(0.5, -175, 0.5, -125)
+MainFrame.BackgroundColor3 = Color3.fromRGB(5, 5, 5)
+MainFrame.BorderSizePixel = 0
+MainFrame.Active = true
+MainFrame.Draggable = true
+MainFrame.ClipsDescendants = true
+MainFrame.Parent = ScreenGui
+
+-- Green Outline
+local Outline = Instance.new("UIStroke")
+Outline.Name = "Outline"
+Outline.Color = Color3.fromRGB(0, 255, 0)
+Outline.Thickness = 2
+Outline.Parent = MainFrame
+
+-- Corner rounding
+local UICorner = Instance.new("UICorner")
+UICorner.CornerRadius = UDim.new(0, 15)
+UICorner.Parent = MainFrame
+
+-- Title
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(1, -20, 0, 45)
+Title.Position = UDim2.new(0, 10, 0, 10)
+Title.BackgroundTransparency = 1
+Title.Text = "DINO AUTOGrab"
+Title.TextColor3 = Color3.fromRGB(0, 255, 0)
+Title.Font = Enum.Font.GothamBlack
+Title.TextSize = 20
+Title.Parent = MainFrame
+
+-- Made by Dino text
+local MadeByLabel = Instance.new("TextLabel")
+MadeByLabel.Size = UDim2.new(1, -20, 0, 18)
+MadeByLabel.Position = UDim2.new(0, 10, 0, 55)
+MadeByLabel.BackgroundTransparency = 1
+MadeByLabel.Text = "made by Dino"
+MadeByLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+MadeByLabel.Font = Enum.Font.GothamBold
+MadeByLabel.TextSize = 11
+MadeByLabel.TextXAlignment = Enum.TextXAlignment.Right
+MadeByLabel.Parent = MainFrame
+
+-- Status Container
+local StatusContainer = Instance.new("Frame")
+StatusContainer.Size = UDim2.new(1, -20, 0, 50)
+StatusContainer.Position = UDim2.new(0, 10, 0, 75)
+StatusContainer.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
+StatusContainer.Parent = MainFrame
+
+local StatusContainerCorner = Instance.new("UICorner")
+StatusContainerCorner.CornerRadius = UDim.new(0, 8)
+StatusContainerCorner.Parent = StatusContainer
+
+local StatusLabel = Instance.new("TextLabel")
+StatusLabel.Size = UDim2.new(1, -10, 1, -10)
+StatusLabel.Position = UDim2.new(0, 5, 0, 5)
+StatusLabel.BackgroundTransparency = 1
+StatusLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+StatusLabel.Font = Enum.Font.Gotham
+StatusLabel.TextSize = 13
+StatusLabel.TextWrapped = true
+StatusLabel.TextXAlignment = Enum.TextXAlignment.Left
+StatusLabel.TextYAlignment = Enum.TextYAlignment.Top
+StatusLabel.Text = "Status: Ready - Platform: "..platform.."\nAuto Grab Active"
+StatusLabel.Parent = StatusContainer
+
+-- Execute Button (Toggle Auto Grab)
+local ExecuteButton = Instance.new("TextButton")
+ExecuteButton.Size = UDim2.new(1, -20, 0, 45)
+ExecuteButton.Position = UDim2.new(0, 10, 0, 130)
+ExecuteButton.BackgroundColor3 = Color3.fromRGB(0, 100, 0)
+ExecuteButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+ExecuteButton.Font = Enum.Font.GothamBold
+ExecuteButton.TextSize = 18
+ExecuteButton.Text = "⚡ TOGGLE AUTOGrab ⚡"
+ExecuteButton.Parent = MainFrame
+
+local ButtonCorner = Instance.new("UICorner")
+ButtonCorner.CornerRadius = UDim.new(0, 10)
+ButtonCorner.Parent = ExecuteButton
+
+-- Info Text
+local InfoText = Instance.new("TextLabel")
+InfoText.Size = UDim2.new(1, -20, 0, 40)
+InfoText.Position = UDim2.new(0, 10, 0, 180)
+InfoText.BackgroundTransparency = 1
+InfoText.TextColor3 = Color3.fromRGB(180, 180, 180)
+InfoText.Font = Enum.Font.Gotham
+InfoText.TextSize = 11
+InfoText.TextWrapped = true
+InfoText.TextXAlignment = Enum.TextXAlignment.Left
+InfoText.TextYAlignment = Enum.TextYAlignment.Top
+InfoText.Text = "Auto Grab everything in proximity\nInstant E activation\nWorks on any proximity prompts"
+InfoText.Parent = MainFrame
+
+-- Simple particle effect
+local particles = {}
+for i = 1, 8 do
+    local particle = Instance.new("Frame")
+    particle.Size = UDim2.new(0, math.random(2, 4), 0, math.random(2, iv))
+    particle.BackgroundColor3 = Color3.fromRGB(0, math.random(200, 255), 0)
+    particle.BorderSizePixel = 0
+    particle.BackgroundTransparency = math.random(50, 80)/100
+    particle.Parent = MainFrame
+
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(1, 0)
+    corner.Parent = particle
+
+    particles[i] = {
+        frame = particle,
+        speedX = math.random(-100, 100)/100,
+        speedY = math.random(-100, 100)/100,
+        posX = math.random() * 0.9 + 0.05,
+        posY = math.random() * 0.9 + 0.05
+    }
+end
+
+-- Animate particles
+spawn(function()
+    while true do
+        for _, p in ipairs(particles) do
+            p.posX = p.posX + p.speedX * 0.01
+            p.posY = p.posY + p.speedY * 0.01
+
+            if p.posX  0.98 then p.posX = 0.98 p.speedX = -math.abs(p.speedX) end
+            if p.posY  0.98 then p.posY = 0.98 p.speedY = -math.abs(p.speedY) end
+
+            p.frame.Position = UDim2.new(p.posX, -p.frame.AbsoluteSize.X/2, p.posY, -p.frame.AbsoluteSize.Y/2)
+        end
+        wait(0.03)
+    end
+end)
+
+-- UI toggle with CTRL (PC only)
+local uiVisible = true
+if not isMobile then
+    UserInputService.InputBegan:Connect(function(input)
+        if input.KeyCode == Enum.KeyCode.LeftControl or input.KeyCode == Enum.KeyCode.RightControl then
+            uiVisible = not uiVisible
+            MainFrame.Visible = uiVisible
+        end
+    end)
+end
+
+-- Auto Grab Logic
+local autoGrabEnabled = false
+local ProximityPromptService = game:GetService("ProximityPromptService")
+
+-- Function to grab everything instantly
+local function grabAllProximity()
+    if not autoGrabEnabled then return end
+
+    -- Find all proximity prompts in workspace
+    for _, obj in pairs(Workspace:GetDescendants()) do
+        if obj:IsA("ProximityPrompt") then
+            -- Instant grab
+            pcall(function()
+                if fireproximityprompt then
+                    fireproximityprompt(obj)
+                else
+                    obj.HoldDuration = 0
+                    obj:InputHoldBegin()
+                    obj:InputHoldEnd()
+                end
+            end)
+        end
+
+        -- Also grab any interactable parts/models
+        if obj:IsA("Part") or obj:IsA("Model") then
+            local nameLower = obj.Name:lower()
+            if nameLower:find("item") or nameLower:find("collect") or nameLower:find("pickup") or nameLower:find("brainrot") then
+                -- Try to interact with it
+                pcall(function()
+                    local char = LocalPlayer.Character
+                    if char then
+                        local rootPart = char:FindFirstChild("HumanoidRootPart")
+                        if rootPart then
+                            rootPart.CFrame = CFrame.new(obj.Position + Vector3.new(0, 3, 0))
+                            wait(0.1)
+                            pressKey(Enum.KeyCode.E)
+                        end
+                    end
+                end)
+            end
+        end
+    end
+
+    -- Look for GUI items to grab
+    for _, gui in pairs({LocalPlayer.PlayerGui}) do
+        for _, obj in pairs(gui:GetDescendants()) do
+            if obj:IsA("TextButton") and obj.Text then
+                local textLower = obj.Text:lower()
+                if textLower:find("collect") or textLower:find("grab") or textLower:find("pickup") or textLower:find("take") then
+                    pcall(function()
+                        mouse1click()
+                    end)
+                end
+            end
+        end
+    end
+end
+
+-- Safe mouse click function
+local function mouse1click()
+    if isMobile then return end
+
+    pcall(function()
+        wait(0.05)
+        VirtualInputManager:SendMouseButtonEvent(
+            math.random(100, 500),
+            math.random(100, 500),
+            0,
+            true,
+            Workspace.CurrentCamera,
+            1
+        )
+        wait(0.05)
+        VirtualInputManager:SendMouseButtonEvent(
+            math.random(100, 500),
+            math.random(100, 500),
+            0,
+            false,
+            Workspace.CurrentCamera,
+            1
+        )
+    end)
+end
+
+-- Key press function
+local function pressKey(key)
+    if isMobile then return end
+
+    pcall(function()
+        VirtualInputManager:SendKeyEvent(true, key, false, nil)
+        wait(0.05)
+        VirtualInputManager:SendKeyEvent(false, key, false, nil)
+    end)
+end
+
+-- Main Auto Grab toggle function
+ExecuteButton.MouseButton1Click:Connect(function()
+    autoGrabEnabled = not autoGrabEnabled
+
+    if autoGrabEnabled then
+        ExecuteButton.BackgroundColor3 = Color3.fromRGB(0, 150, 0)
+        ExecuteButton.Text = "⚡ AUTOGrab ON ⚡"
+        StatusLabel.Text = "Status: Auto Grab ACTIVE\nGrabbing everything automatically"
+
+        -- Start auto grab loop
+        spawn(function()
+            while autoGrabEnabled do
+                grabAllProximity()
+                wait(0.5) -- Grab every 0.5 seconds
+            end
+        end)
+
+        -- Also listen for proximity prompts automatically
+        ProximityPromptService.PromptShown:Connect(function(prompt)
+            if autoGrabEnabled then
+                prompt.HoldDuration = 0
+                pcall(function()
+                    if fireproximityprompt then
+                        fireproximityprompt(prompt)
+                    else
+                        prompt:InputHoldBegin()
+                        prompt:InputHoldEnd()
+                    end
+                end)
+            end
+        end)
+
+    else
+        ExecuteButton.BackgroundColor3 = Color3.fromRGB(0, 100, 0)
+        ExecuteButton.Text = "⚡ TOGGLE AUTOGrab ⚡"
+        StatusLabel.Text = "Status: Auto Grab OFF\nPress to activate"
+    end
+end)
+
+-- Platform-specific instructions
+if isMobile then
+    StatusLabel.Text = StatusLabel.Text.."\n(Mobile detected - manual clicks needed)"
+else
+    StatusLabel.Text = StatusLabel.Text.."\n(Press CTRL to hide/show UI)"
+end
+
+print("[DinoScripts] Auto Grab loaded successfully!")
+print("[DinoScripts] Platform: "..platform)
+print("[DinoScripts] Made by Dino")
+`
