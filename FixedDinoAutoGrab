@@ -1,0 +1,373 @@
+-- DinoScripts Auto Grab Executor - Fixed Version (No Teleport)
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local Workspace = game:GetService("Workspace")
+local RunService = game:GetService("RunService")
+local VirtualInputManager = game:GetService("VirtualInputManager")
+local ProximityPromptService = game:GetService("ProximityPromptService")
+local UserInputService = game:GetService("UserInputService")
+
+-- UI Creation
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "DinoScriptsAutoGrab"
+ScreenGui.Parent = game.CoreGui
+
+-- Small rectangular UI frame
+local MainFrame = Instance.new("Frame")
+MainFrame.Size = UDim2.new(0, 200, 0, 60)
+MainFrame.Position = UDim2.new(0.05, 0, 0.05, 0)
+MainFrame.BackgroundColor3 = Color3.fromRGB(5, 5, 5)
+MainFrame.BorderSizePixel = 0
+MainFrame.ClipsDescendants = true
+MainFrame.Active = true
+MainFrame.Draggable = true
+MainFrame.Parent = ScreenGui
+
+-- Green outline
+local Outline = Instance.new("UIStroke")
+Outline.Color = Color3.fromRGB(0, 255, 0)
+Outline.Thickness = 2
+Outline.Parent = MainFrame
+
+-- Corner rounding
+local UICorner = Instance.new("UICorner")
+UICorner.CornerRadius = UDim.new(0, 8)
+UICorner.Parent = MainFrame
+
+-- Title label
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(1, -10, 0, 25)
+Title.Position = UDim2.new(0, 5, 0, 5)
+Title.BackgroundTransparency = 1
+Title.Text = "DINO AUTOGrab"
+Title.TextColor3 = Color3.fromRGB(0, 255, 0)
+Title.Font = Enum.Font.GothamBlack
+Title.TextSize = 16
+Title.TextXAlignment = Enum.TextXAlignment.Left
+Title.Parent = MainFrame
+
+-- Status label
+local StatusLabel = Instance.new("TextLabel")
+StatusLabel.Size = UDim2.new(1, -10, 0, 30)
+StatusLabel.Position = UDim2.new(0, 5, 0, 30)
+StatusLabel.BackgroundTransparency = 1
+StatusLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+StatusLabel.Font = Enum.Font.Gotham
+StatusLabel.TextSize = 12
+StatusLabel.TextXAlignment = Enum.TextXAlignment.Left
+StatusLabel.TextYAlignment = Enum.TextYAlignment.Top
+StatusLabel.Text = "Status: Auto Grab Running..."
+StatusLabel.Parent = MainFrame
+
+-- Simple particles
+local particles = {}
+for i = 1, 5 do
+    local particle = Instance.new("Frame")
+    particle.Size = UDim2.new(0, math.random(2, 4), 0, math.random(2, 4))
+    particle.BackgroundColor3 = Color3.fromRGB(0, math.random(200, 255), 0)
+    particle.BorderSizePixel = 0
+    particle.BackgroundTransparency = math.random(50, 80)/100
+    particle.Parent = MainFrame
+
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(1, 0)
+    corner.Parent = particle
+
+    particles[i] = {
+        frame = particle,
+        speedX = math.random(-80, 80)/100,
+        speedY = math.random(-80, 80)/100,
+        posX = math.random() * 0.9 + 0.05,
+        posY = math.random() * 0.9 + 0.05
+    }
+end
+
+-- Animate particles
+spawn(function()
+    while task.wait(0.03) do
+        for _, p in ipairs(particles) do
+            p.posX = p.posX + p.speedX * 0.01
+            p.posY = p.posY + p.speedY * 0.01
+
+            if p.posX < 0.02 then 
+                p.posX = 0.02 
+                p.speedX = math.abs(p.speedX) 
+            end
+            
+            if p.posX > 0.98 then 
+                p.posX = 0.98 
+                p.speedX = -math.abs(p.speedX) 
+            end
+            
+            if p.posY < 0.02 then 
+                p.posY = 0.02 
+                p.speedY = math.abs(p.speedY) 
+            end
+            
+            if p.posY > 0.98 then 
+                p.posY = 0.98 
+                p.speedY = -math.abs(p.speedY) 
+            end
+
+            p.frame.Position = UDim2.new(p.posX, -p.frame.AbsoluteSize.X/2, p.posY, -p.frame.AbsoluteSize.Y/2)
+        end
+    end
+end)
+
+-- Key press function
+local function pressKey(key)
+    VirtualInputManager:SendKeyEvent(true, key, false, nil)
+    task.wait(0.05)
+    VirtualInputManager:SendKeyEvent(false, key, false, nil)
+end
+
+-- Check if player is near an object (distance check)
+local function isNearObject(position, maxDistance)
+    local character = LocalPlayer.Character
+    if not character then return false end
+    
+    local rootPart = character:FindFirstChild("HumanoidRootPart")
+    if not rootPart then return false end
+    
+    local distance = (rootPart.Position - position).Magnitude
+    return distance <= maxDistance
+end
+
+-- Grab proximity prompts when nearby (NO TELEPORT)
+local function grabProximity(prompt)
+    if prompt and prompt:IsA("ProximityPrompt") then
+        -- Get prompt position
+        local promptPosition
+        local parent = prompt.Parent
+        
+        if parent then
+            if parent:IsA("Model") and parent.PrimaryPart then
+                promptPosition = parent.PrimaryPart.Position
+            elseif parent:IsA("BasePart") then
+                promptPosition = parent.Position
+            else
+                promptPosition = parent:GetPivot().Position
+            end
+            
+            -- Check if player is near the prompt (within activation distance)
+            if isNearObject(promptPosition, prompt.MaxActivationDistance or 10) then
+                -- Try to trigger the prompt
+                local success, result = pcall(function()
+                    prompt.HoldDuration = 0
+                    
+                    -- Method 1: Use fireproximityprompt if available
+                    if fireproximityprompt then
+                        fireproximityprompt(prompt)
+                        return true
+                    end
+                    
+                    -- Method 2: Use prompt methods
+                    prompt:InputHoldBegin()
+                    task.wait(0.01)
+                    prompt:InputHoldEnd()
+                    return true
+                end)
+                
+                if success then
+                    StatusLabel.Text = "Status: Grabbed "..prompt.Name
+                    return true
+                end
+            end
+        end
+    end
+    return false
+end
+
+-- Collect items when nearby (NO TELEPORT)
+local function collectItems()
+    local character = LocalPlayer.Character
+    if not character then return end
+    
+    local rootPart = character:FindFirstChild("HumanoidRootPart")
+    if not rootPart then return end
+    
+    for _, obj in pairs(Workspace:GetDescendants()) do
+        if obj:IsA("ProximityPrompt") then
+            grabProximity(obj)
+        elseif obj:IsA("Part") or obj:IsA("Model") then
+            local nameLower = obj.Name:lower()
+            if nameLower:find("item") or nameLower:find("collect") or nameLower:find("pickup") or nameLower:find("brainrot") or nameLower:find("coin") or nameLower:find("money") then
+                -- Get item position
+                local position
+                if obj:IsA("Model") and obj.PrimaryPart then
+                    position = obj.PrimaryPart.Position
+                else
+                    position = obj.Position
+                end
+                
+                -- Check if player is near the item (within 10 studs)
+                if isNearObject(position, 10) then
+                    -- Press E to collect
+                    pressKey(Enum.KeyCode.E)
+                    StatusLabel.Text = "Status: Collecting "..obj.Name
+                    task.wait(0.2)
+                end
+            end
+        end
+    end
+end
+
+-- Collect GUI items (fixed)
+local function collectGUIItems()
+    local gui = LocalPlayer:FindFirstChild("PlayerGui")
+    if not gui then return end
+    
+    for _, obj in pairs(gui:GetDescendants()) do
+        if obj:IsA("TextButton") and obj.Text then
+            local textLower = obj.Text:lower()
+            if textLower:find("collect") or textLower:find("grab") or textLower:find("pickup") or textLower:find("take") or textLower:find("claim") then
+                -- Click on the button (only if visible and enabled)
+                if obj.Visible and obj.Active then
+                    local absPos = obj.AbsolutePosition
+                    local absSize = obj.AbsoluteSize
+                    
+                    if absPos and absSize then
+                        local centerX = absPos.X + absSize.X / 2
+                        local centerY = absPos.Y + absSize.Y / 2
+                        
+                        VirtualInputManager:SendMouseButtonEvent(centerX, centerY, 0, true, Workspace.CurrentCamera, 1)
+                        task.wait(0.05)
+                        VirtualInputManager:SendMouseButtonEvent(centerX, centerY, 0, false, Workspace.CurrentCamera, 1)
+                        
+                        StatusLabel.Text = "Status: Clicked "..obj.Text
+                    end
+                end
+            end
+        elseif obj:IsA("ImageButton") then
+            local nameLower = obj.Name:lower()
+            if nameLower:find("collect") or nameLower:find("grab") or nameLower:find("pickup") then
+                -- Click on the image button (only if visible and enabled)
+                if obj.Visible and obj.Active then
+                    local absPos = obj.AbsolutePosition
+                    local absSize = obj.AbsoluteSize
+                    
+                    if absPos and absSize then
+                        local centerX = absPos.X + absSize.X / 2
+                        local centerY = absPos.Y + absSize.Y / 2
+                        
+                        VirtualInputManager:SendMouseButtonEvent(centerX, centerY, 0, true, Workspace.CurrentCamera, 1)
+                        task.wait(0.05)
+                        VirtualInputManager:SendMouseButtonEvent(centerX, centerY, 0, false, Workspace.CurrentCamera, 1)
+                    end
+                end
+            end
+        end
+    end
+end
+
+-- Listen for new proximity prompts (fixed)
+ProximityPromptService.PromptShown:Connect(function(prompt)
+    grabProximity(prompt)
+end)
+
+-- Main auto grab loop (fixed - no teleport)
+spawn(function()
+    while task.wait(0.5) do -- Fixed: using task.wait instead of while true with wait inside
+        StatusLabel.Text = "Status: Scanning for nearby items..."
+        
+        -- Method 1: Collect proximity prompts (only when nearby)
+        collectItems()
+        
+        -- Method 2: Collect GUI items
+        collectGUIItems()
+        
+        StatusLabel.Text = "Status: Auto Grab Running..."
+    end
+end)
+
+-- Also scan for click detectors and touch interests when nearby (NO TELEPORT)
+spawn(function()
+    while task.wait(0.3) do
+        local character = LocalPlayer.Character
+        if not character then continue end
+        
+        local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
+        if not humanoidRootPart then continue end
+        
+        -- Look for ClickDetectors when nearby
+        for _, obj in pairs(Workspace:GetDescendants()) do
+            if obj:IsA("ClickDetector") then
+                -- Get parent position
+                local parent = obj.Parent
+                if parent then
+                    local position
+                    if parent:IsA("Model") and parent.PrimaryPart then
+                        position = parent.PrimaryPart.Position
+                    elseif parent:IsA("BasePart") then
+                        position = parent.Position
+                    else
+                        position = parent:GetPivot().Position
+                    end
+                    
+                    -- Check if player is near (within click detector's max distance)
+                    local distance = (humanoidRootPart.Position - position).Magnitude
+                    if distance <= (obj.MaxActivationDistance or 32) then
+                        -- Try to trigger click detector
+                        local success = pcall(function()
+                            obj.MouseClick:Fire()
+                            StatusLabel.Text = "Status: Clicked "..parent.Name
+                        end)
+                    end
+                end
+            elseif obj:IsA("TouchTransmitter") then
+                -- Touch transmitters (for parts you walk into)
+                local parent = obj.Parent
+                if parent and parent:IsA("BasePart") then
+                    local distance = (humanoidRootPart.Position - parent.Position).Magnitude
+                    if distance <= 5 then -- Within touching distance
+                        StatusLabel.Text = "Status: Touching "..parent.Name
+                    end
+                end
+            end
+        end
+    end
+end)
+
+-- Add toggle button to UI for manual control
+local ToggleButton = Instance.new("TextButton")
+ToggleButton.Size = UDim2.new(0, 60, 0, 20)
+ToggleButton.Position = UDim2.new(1, -65, 0, 5)
+ToggleButton.BackgroundColor3 = Color3.fromRGB(0, 100, 0)
+ToggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+ToggleButton.Font = Enum.Font.GothamBold
+ToggleButton.TextSize = 10
+ToggleButton.Text = "ON"
+ToggleButton.AutoButtonColor = false
+ToggleButton.Parent = MainFrame
+
+local ToggleCorner = Instance.new("UICorner")
+ToggleCorner.CornerRadius = UDim.new(0, 4)
+ToggleCorner.Parent = ToggleButton
+
+local autoGrabEnabled = true
+
+ToggleButton.MouseButton1Click:Connect(function()
+    autoGrabEnabled = not autoGrabEnabled
+    
+    if autoGrabEnabled then
+        ToggleButton.BackgroundColor3 = Color3.fromRGB(0, 100, 0)
+        ToggleButton.Text = "ON"
+        StatusLabel.Text = "Status: Auto Grab Enabled"
+    else
+        ToggleButton.BackgroundColor3 = Color3.fromRGB(100, 0, 0)
+        ToggleButton.Text = "OFF"
+        StatusLabel.Text = "Status: Auto Grab Disabled"
+    end
+end)
+
+-- Modify main loop to respect toggle state
+local originalLoop = getfenv().collectItems
+getfenv().collectItems = function()
+    if autoGrabEnabled then
+        return originalLoop()
+    end
+end
+
+print("[DinoScripts] Auto Grab executor running successfully!")
+print("[DinoScripts] NO TELEPORT - Only collects when you're nearby")
+print("[DinoScripts] Toggle button added to UI")
