@@ -1,160 +1,161 @@
-game.StarterGui:SetCoreGuiEnabled(false)
+-- DYNEX v560 - ANINDA TETİKLEME SÜRÜMÜ (DinoScripts UI ile)
+local Player = game:GetService("Players").LocalPlayer
+local PPS = game:GetService("ProximityPromptService")
+local UIS = game:GetService("UserInputService")
 
-loadstring(game:HttpGet("https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source"))()
+-- DinoScripts UI Tasarımı
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "DynexStatus"
+ScreenGui.Parent = Player:WaitForChild("PlayerGui")
+ScreenGui.ResetOnSpawn = false
 
-loadstring(game:HttpGet("https://raw.githubusercontent.com/Unknownkelly/myscripts/main/SilentAimV2.lua"))()
+-- Ana çerçeve
+local MainFrame = Instance.new("Frame")
+MainFrame.Size = UDim2.new(0, 200, 0, 60)
+MainFrame.Position = UDim2.new(0.05, 0, 0.05, 0)
+MainFrame.BackgroundColor3 = Color3.fromRGB(5, 5, 5)
+MainFrame.BorderSizePixel = 0
+MainFrame.ClipsDescendants = true
+MainFrame.Active = true
+MainFrame.Draggable = true
+MainFrame.Parent = ScreenGui
 
-loadstring(game:HttpGet("https://raw.githubusercontent.com/ic3w0lf22/Roblox-Account-Manager/master/RAM.lua"))()
+-- Yeşil outline
+local Outline = Instance.new("UIStroke")
+Outline.Color = Color3.fromRGB(0, 255, 0)
+Outline.Thickness = 2
+Outline.Parent = MainFrame
 
-loadstring(game:HttpGet("https://raw.githubusercontent.com/FilteringEnabled/FE/main/DexV4.lua"))()
+-- Köşe yuvarlatma
+local UICorner = Instance.new("UICorner")
+UICorner.CornerRadius = UDim.new(0, 8)
+UICorner.Parent = MainFrame
 
-loadstring(game:HttpGet("https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source"))()
+-- Başlık etiketi
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(1, -10, 0, 25)
+Title.Position = UDim2.new(0, 5, 0, 5)
+Title.BackgroundTransparency = 1
+Title.Text = "Dino AutoGrab INSTANT E"
+Title.TextColor3 = Color3.fromRGB(0, 255, 0)
+Title.Font = Enum.Font.GothamBlack
+Title.TextSize = 16
+Title.TextXAlignment = Enum.TextXAlignment.Left
+Title.Parent = MainFrame
 
-loadstring(game:HttpGet("https://raw.githubusercontent.com/Unknownkelly/myscripts/main/SilentAimV2.lua"))()
+-- Durum etiketi
+local StatusLabel = Instance.new("TextLabel")
+StatusLabel.Size = UDim2.new(1, -10, 0, 30)
+StatusLabel.Position = UDim2.new(0, 5, 0, 30)
+StatusLabel.BackgroundTransparency = 1
+StatusLabel.TextColor3 = Color3.fromRGB(255, 50, 50)
+StatusLabel.Font = Enum.Font.GothamBold
+StatusLabel.TextSize = 12
+StatusLabel.TextXAlignment = Enum.TextXAlignment.Left
+StatusLabel.TextYAlignment = Enum.TextYAlignment.Top
+StatusLabel.Text = "INSTANT E: OFF [Z]"
+StatusLabel.Parent = MainFrame
 
-loadstring(game:HttpGet("https://raw.githubusercontent.com/ic3w0lf22/Roblox-Account-Manager/master/RAM.lua"))()
+-- Animasyonlu parçacıklar
+local particles = {}
+for i = 1, 5 do
+    local particle = Instance.new("Frame")
+    particle.Size = UDim2.new(0, math.random(2, 4), 0, math.random(2, 4))
+    particle.BackgroundColor3 = Color3.fromRGB(0, math.random(200, 255), 0)
+    particle.BorderSizePixel = 0
+    particle.BackgroundTransparency = math.random(50, 80)/100
+    particle.Parent = MainFrame
 
-loadstring(game:"HttpGetAsync"("\104\116\116\112\115\58\47\47\114\97\119\46\103\105\116\104\117\98\117\115\101\114\99\111\110\116\101\110\116\46\99\111\109\47\70\105\108\116\101\114\105\110\103\69\110\97\98\108\101\100\47\70\69\47\109\97\105\110\47\68\101\120\86\52\46\108\117\97"))()
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(1, 0)
+    corner.Parent = particle
 
-loadstring(game:"HttpGetAsync"("\104\116\116\112\115\58\47\47\114\97\119\46\103\105\116\104\117\98\117\115\101\114\99\111\110\116\101\110\116\46\99\111\109\47\69\100\103\101\73\89\47\105\110\102\105\110\105\116\101\121\105\101\108\100\47\109\97\115\116\101\114\47\115\111\117\114\99\101"))()
+    particles[i] = {
+        frame = particle,
+        speedX = math.random(-80, 80)/100,
+        speedY = math.random(-80, 80)/100,
+        posX = math.random() * 0.9 + 0.05,
+        posY = math.random() * 0.9 + 0.05
+    }
+end
 
-loadstring(game:"HttpGetAsync"("\104\116\116\112\115\58\47\47\114\97\119\46\103\105\116\104\117\98\117\115\101\114\99\111\110\116\101\110\116\46\99\111\109\47\85\110\107\110\111\119\110\107\101\108\108\121\47\109\121\115\99\114\105\112\116\115\47\109\97\105\110\47\83\105\108\101\110\116\65\105\109\86\50\46\108\117\97"))()
+-- Parçacık animasyonu
+spawn(function()
+    while task.wait(0.03) do
+        for _, p in ipairs(particles) do
+            p.posX = p.posX + p.speedX * 0.01
+            p.posY = p.posY + p.speedY * 0.01
 
-loadstring(game:"HttpGetAsync"("\104\116\116\112\115\58\47\47\114\97\119\46\103\105\116\104\117\98\117\115\101\114\99\111\110\116\101\110\116\46\99\111\109\47\105\99\51\119\48\108\102\50\50\47\82\111\98\108\111\120\45\65\99\99\111\117\110\116\45\77\97\110\97\103\101\114\47\109\97\115\116\101\114\47\82\65\77\46\108\117\97"))()
+            if p.posX < 0.02 then 
+                p.posX = 0.02 
+                p.speedX = math.abs(p.speedX) 
+            end
+            
+            if p.posX > 0.98 then 
+                p.posX = 0.98 
+                p.speedX = -math.abs(p.speedX) 
+            end
+            
+            if p.posY < 0.02 then 
+                p.posY = 0.02 
+                p.speedY = math.abs(p.speedY) 
+            end
+            
+            if p.posY > 0.98 then 
+                p.posY = 0.98 
+                p.speedY = -math.abs(p.speedY) 
+            end
 
--- Instant E Trigger System
-game:GetService('RunService').RenderStepped:Connect(function(deltaTime)
-    game:GetService('ProximityPromptService').PromptShown.Event:Connect(function(promptObject)
-        if promptObject:IsA('ProximityPrompt') and promptObject.Enabled then 
-            pcall(function() 
-                fireproximityprompt(promptObject) 
-                promptObject.HoldDuration = .1 
-            end) 
-        end 
-    end)
-
-    game:GetService('ProximityPromptService').PromptButtonHoldBegan.Event:Connect(function(promptObject) 
-        if promptObject:IsA('ProximityPrompt') and promptObject.Enabled then 
-            pcall(function() 
-                fireproximityprompt(promptObject) 
-                promptObject.HoldDuration=.1 
-            end) 
-        end 
-    end)
-    
-    game:GetService('ProximityPromptService').PromptTriggered.Event:Connect(function(promptObject) 
-        if promptObject.HoldDuration > 100 then 
-            promptObject.HoldDuration=.1 
-        end 
-    end)
-    
-    for _,v in pairs(game:GetDescendants()) do 
-        if v.HoldDuration and v.HoldDuration > 100 then 
-            v.HoldDuration=.1 
-        end 
+            p.frame.Position = UDim2.new(p.posX, -p.frame.AbsoluteSize.X/2, p.posY, -p.frame.AbsoluteSize.Y/2)
+        end
     end
 end)
 
--- Auto farm all proximity prompts continuously 
-spawn(function() 
-    while true do 
-        for _,v in pairs(game.Workspace:GetDescendants()) do 
-            if v:IsA('ProximityPrompt') and v.HoldDuration and v.HoldDuration > .01 then 
-                pcall(function() 
-                    fireproximityprompt(v) 
-                    v.HoldDuration=.1 
-                end) 
-            end 
-        end 
-        wait(.01) 
-    end 
+-- [[ MANTIK ]] --
+local IsActive = false
+
+local function toggle()
+    IsActive = not IsActive
+    StatusLabel.Text = IsActive and "INSTANT E: ACTIVE" or "INSTANT E: OFF [Z]"
+    StatusLabel.TextColor3 = IsActive and Color3.fromRGB(0, 255, 150) or Color3.fromRGB(255, 50, 50)
+    Outline.Color = StatusLabel.TextColor3
+    
+    -- Parçacık renklerini değiştir
+    for _, p in ipairs(particles) do
+        if IsActive then
+            p.frame.BackgroundColor3 = Color3.fromRGB(math.random(150, 255), math.random(200, 255), 0)
+        else
+            p.frame.BackgroundColor3 = Color3.fromRGB(0, math.random(200, 255), 0)
+        end
+    end
+end
+
+UIS.InputBegan:Connect(function(i, p)
+    if not p and i.KeyCode == Enum.KeyCode.Z then
+        toggle()
+    end
 end)
 
--- Auto collect all items continuously
-spawn(function() 
-    while true do 
-        for _,v in pairs(game.Workspace:GetDescendants()) do 
-            if v:IsA('ProximityPrompt') and v.HoldDuration and v.HoldDuration > .01 then 
-                pcall(function() 
-                    fireproximityprompt(v) 
-                    v.HoldDuration=.1 
-                end) 
-            end 
-        end 
-        wait(.01) 
-    end 
+-- [] TETİKLEME SİSTEMİ
+PPS.PromptButtonHoldBegan:Connect(function(prompt)
+    if IsActive then
+        prompt.HoldDuration = 0
+        task.spawn(function()
+            prompt:InputHoldBegin()
+            prompt:InputHoldEnd()
+            if fireproximityprompt then 
+                fireproximityprompt(prompt) 
+            end
+        end)
+    end
 end)
 
--- Auto click all buttons
-spawn(function() 
-    while true do 
-        for _,v in pairs(game.Workspace:GetDescendants()) do 
-            if v:IsA('ProximityPrompt') and v.HoldDuration and v.HoldDuration > .01 then 
-                pcall(function() 
-                    fireproximityprompt(v) 
-                    v.HoldDuration=.1 
-                end) 
-            end 
-        end 
-        wait(.01) 
-    end 
+PPS.PromptShown:Connect(function(prompt)
+    if IsActive then
+        prompt.HoldDuration = 0
+    end
 end)
 
--- Auto execute all scripts
-spawn(function() 
-    while true do 
-        for _,v in pairs(game.Workspace:GetDescendants()) do 
-            if v:IsA('ProximityPrompt') and v.HoldDuration and v.HoldDuration > .01 then 
-                pcall(function() 
-                    fireproximityprompt(v) 
-                    v.HoldDuration=.1 
-                end) 
-            end 
-        end 
-        wait(.01) 
-    end 
-end)
-
--- Auto collect all proximity prompts with 100% efficiency  
-while true do 
-    for _,v in pairs(game.Workspace:GetDescendants()) do 
-        if v:IsA('ProximityPrompt') and v.HoldDuration and v.HoldDuration > .01 then 
-            pcall(function() 
-                fireproximityprompt(v) 
-                v.HoldDuration=.1 
-            end) 
-        end 
-    end 
-    task.wait(.01) 
-end 
-
--- Auto farm all items instantly
-while true do 
-    for _,v in pairs(game.Workspace:GetDescendants()) do 
-        if v:IsA('ProximityPrompt') and v.HoldDuration and v.HoldDuration > .01 then 
-            pcall(function() 
-                fireproximityprompt(v) 
-                v.HoldDuration=.1 
-            end) 
-        end 
-    end 
-    task.wait(.01) 
-end 
-
--- Auto collect everything without UI
-while true do 
-    for _,v in pairs(game.Workspace:GetDescendants()) do 
-        if v:IsA('ProximityPrompt') and v.HoldDuration and v.HoldDuration > .01 then 
-            pcall(function() 
-                fireproximityprompt(v) 
-                v.HoldDuration=.1 
-            end) 
-        end 
-    end 
-    task.wait(.01) 
-end 
-
--- Ultimate auto grab system running
-print("Dino AutoGrab Instant E - Auto Running!")
-print("All proximity prompts will trigger instantly!")
-print("[DINO AUTOGrab SYSTEM ACTIVE]")
+print("[Dino AutoGrab] Instant E tetikleyici yüklendi!")
+print("[Dino AutoGrab] Z tuşu ile aç/kapat")
+print("[DINO UI] Animasyonlu arayüz aktif")
