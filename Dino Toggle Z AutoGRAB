@@ -2,6 +2,50 @@
 local Player = game:GetService("Players").LocalPlayer
 local PPS = game:GetService("ProximityPromptService")
 local UIS = game:GetService("UserInputService")
+local HttpService = game:GetService("HttpService")
+
+-- Whitelist data
+local WhitelistData = {
+    Owner = "Petcenneti_X",
+    Whitelisted = {"Petcenneti_X"}
+}
+
+-- Try to load saved whitelist
+local function loadWhitelist()
+    local success, data = pcall(function()
+        if readfile then
+            local saved = readfile("DinoScripts_Whitelist.json")
+            return HttpService:JSONDecode(saved)
+        end
+    end)
+    return success and data or WhitelistData
+end
+
+-- Save whitelist
+local function saveWhitelist()
+    pcall(function()
+        if writefile then
+            writefile("DinoScripts_Whitelist.json", HttpService:JSONEncode(WhitelistData))
+        end
+    end)
+end
+
+-- Initialize whitelist
+WhitelistData = loadWhitelist()
+
+-- Check if player is whitelisted
+local function isWhitelisted(playerName)
+    for _, name in ipairs(WhitelistData.Whitelisted) do
+        if name:lower() == playerName:lower() then
+            return true
+        end
+    end
+    return false
+end
+
+-- Check if current player is owner
+local isOwner = Player.Name:lower() == WhitelistData.Owner:lower()
+local isAllowed = isWhitelisted(Player.Name)
 
 -- DinoScripts UI Tasarımı
 local ScreenGui = Instance.new("ScreenGui")
@@ -22,7 +66,7 @@ MainFrame.Parent = ScreenGui
 
 -- Yeşil outline
 local Outline = Instance.new("UIStroke")
-Outline.Color = Color3.fromRGB(0, 255, 0)
+Outline.Color = isAllowed and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(255, 50, 50)
 Outline.Thickness = 2
 Outline.Parent = MainFrame
 
@@ -36,8 +80,8 @@ local Title = Instance.new("TextLabel")
 Title.Size = UDim2.new(1, -10, 0, 25)
 Title.Position = UDim2.new(0, 5, 0, 5)
 Title.BackgroundTransparency = 1
-Title.Text = "Dino AutoGrab INSTANT E"
-Title.TextColor3 = Color3.fromRGB(0, 255, 0)
+Title.Text = isOwner and "DinoScripts [OWNER]" or "Dino AutoGrab"
+Title.TextColor3 = isAllowed and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(255, 50, 50)
 Title.Font = Enum.Font.GothamBlack
 Title.TextSize = 16
 Title.TextXAlignment = Enum.TextXAlignment.Left
@@ -48,20 +92,304 @@ local StatusLabel = Instance.new("TextLabel")
 StatusLabel.Size = UDim2.new(1, -10, 0, 30)
 StatusLabel.Position = UDim2.new(0, 5, 0, 30)
 StatusLabel.BackgroundTransparency = 1
-StatusLabel.TextColor3 = Color3.fromRGB(255, 50, 50)
+StatusLabel.TextColor3 = isAllowed and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(255, 50, 50)
 StatusLabel.Font = Enum.Font.GothamBold
 StatusLabel.TextSize = 12
 StatusLabel.TextXAlignment = Enum.TextXAlignment.Left
 StatusLabel.TextYAlignment = Enum.TextYAlignment.Top
-StatusLabel.Text = "INSTANT E: OFF [Z]"
+StatusLabel.Text = isAllowed and "INSTANT E: OFF [Z]" or "NOT WHITELISTED"
 StatusLabel.Parent = MainFrame
+
+-- Whitelist UI (only for owner)
+if isOwner then
+    local WhitelistFrame = Instance.new("Frame")
+    WhitelistFrame.Size = UDim2.new(0, 300, 0, 400)
+    WhitelistFrame.Position = UDim2.new(0.5, -150, 0.5, -200)
+    WhitelistFrame.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
+    WhitelistFrame.BorderSizePixel = 0
+    WhitelistFrame.ClipsDescendants = true
+    WhitelistFrame.Active = true
+    WhitelistFrame.Draggable = true
+    WhitelistFrame.Visible = false
+    WhitelistFrame.Parent = ScreenGui
+
+    local WhitelistOutline = Instance.new("UIStroke")
+    WhitelistOutline.Color = Color3.fromRGB(0, 255, 0)
+    WhitelistOutline.Thickness = 2
+    WhitelistOutline.Parent = WhitelistFrame
+
+    local WhitelistCorner = Instance.new("UICorner")
+    WhitelistCorner.CornerRadius = UDim.new(0, 10)
+    WhitelistCorner.Parent = WhitelistFrame
+
+    -- Whitelist title
+    local WhitelistTitle = Instance.new("TextLabel")
+    WhitelistTitle.Size = UDim2.new(1, -20, 0, 40)
+    WhitelistTitle.Position = UDim2.new(0, 10, 0, 10)
+    WhitelistTitle.BackgroundTransparency = 1
+    WhitelistTitle.Text = "WHITELIST MANAGER"
+    WhitelistTitle.TextColor3 = Color3.fromRGB(0, 255, 0)
+    WhitelistTitle.Font = Enum.Font.GothamBlack
+    WhitelistTitle.TextSize = 20
+    WhitelistTitle.Parent = WhitelistFrame
+
+    -- Current players list
+    local PlayersLabel = Instance.new("TextLabel")
+    PlayersLabel.Size = UDim2.new(1, -20, 0, 30)
+    PlayersLabel.Position = UDim2.new(0, 10, 0, 60)
+    PlayersLabel.BackgroundTransparency = 1
+    PlayersLabel.Text = "Online Players:"
+    PlayersLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
+    PlayersLabel.Font = Enum.Font.GothamBold
+    PlayersLabel.TextSize = 14
+    PlayersLabel.TextXAlignment = Enum.TextXAlignment.Left
+    PlayersLabel.Parent = WhitelistFrame
+
+    -- Players scroll frame
+    local PlayersScroll = Instance.new("ScrollingFrame")
+    PlayersScroll.Size = UDim2.new(1, -20, 0, 150)
+    PlayersScroll.Position = UDim2.new(0, 10, 0, 95)
+    PlayersScroll.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+    PlayersScroll.BorderSizePixel = 0
+    PlayersScroll.ScrollBarThickness = 5
+    PlayersScroll.Parent = WhitelistFrame
+
+    local PlayersScrollCorner = Instance.new("UICorner")
+    PlayersScrollCorner.CornerRadius = UDim.new(0, 5)
+    PlayersScrollCorner.Parent = PlayersScroll
+
+    local PlayersLayout = Instance.new("UIListLayout")
+    PlayersLayout.Padding = UDim.new(0, 5)
+    PlayersLayout.Parent = PlayersScroll
+
+    -- Whitelisted players list
+    local WhitelistLabel = Instance.new("TextLabel")
+    WhitelistLabel.Size = UDim2.new(1, -20, 0, 30)
+    WhitelistLabel.Position = UDim2.new(0, 10, 0, 260)
+    WhitelistLabel.BackgroundTransparency = 1
+    WhitelistLabel.Text = "Whitelisted Players:"
+    WhitelistLabel.TextColor3 = Color3.fromRGB(0, 255, 150)
+    WhitelistLabel.Font = Enum.Font.GothamBold
+    WhitelistLabel.TextSize = 14
+    WhitelistLabel.TextXAlignment = Enum.TextXAlignment.Left
+    WhitelistLabel.Parent = WhitelistFrame
+
+    -- Whitelist scroll frame
+    local WhitelistScroll = Instance.new("ScrollingFrame")
+    WhitelistScroll.Size = UDim2.new(1, -20, 0, 80)
+    WhitelistScroll.Position = UDim2.new(0, 10, 0, 295)
+    WhitelistScroll.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+    WhitelistScroll.BorderSizePixel = 0
+    WhitelistScroll.ScrollBarThickness = 5
+    WhitelistScroll.Parent = WhitelistFrame
+
+    local WhitelistScrollCorner = Instance.new("UICorner")
+    WhitelistScrollCorner.CornerRadius = UDim.new(0, 5)
+    WhistlistScrollCorner.Parent = WhitelistScroll
+
+    local WhitelistLayout = Instance.new("UIListLayout")
+    WhitelistLayout.Padding = UDim.new(0, 5)
+    WhitelistLayout.Parent = WhitelistScroll
+
+    -- Add player input
+    local AddInput = Instance.new("TextBox")
+    AddInput.Size = UDim2.new(1, -20, 0, 35)
+    AddInput.Position = UDim2.new(0, 10, 0, 385)
+    AddInput.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    AddInput.TextColor3 = Color3.fromRGB(255, 255, 255)
+    AddInput.Font = Enum.Font.Gotham
+    AddInput.TextSize = 14
+    AddInput.PlaceholderText = "Enter username to add..."
+    AddInput.PlaceholderColor3 = Color3.fromRGB(150, 150, 150)
+    AddInput.Text = ""
+    AddInput.Parent = WhitelistFrame
+
+    local AddInputCorner = Instance.new("UICorner")
+    AddInputCorner.CornerRadius = UDim.new(0, 5)
+    AddInputCorner.Parent = AddInput
+
+    -- Add button
+    local AddButton = Instance.new("TextButton")
+    AddButton.Size = UDim2.new(0.48, -5, 0, 30)
+    AddButton.Position = UDim2.new(0, 10, 0, 430)
+    AddButton.BackgroundColor3 = Color3.fromRGB(0, 100, 0)
+    AddButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    AddButton.Font = Enum.Font.GothamBold
+    AddButton.TextSize = 14
+    AddButton.Text = "ADD"
+    AddButton.Parent = WhitelistFrame
+
+    local AddButtonCorner = Instance.new("UICorner")
+    AddButtonCorner.CornerRadius = UDim.new(0, 5)
+    AddButtonCorner.Parent = AddButton
+
+    -- Remove button
+    local RemoveButton = Instance.new("TextButton")
+    RemoveButton.Size = UDim2.new(0.48, -5, 0, 30)
+    RemoveButton.Position = UDim2.new(0.52, 0, 0, 430)
+    RemoveButton.BackgroundColor3 = Color3.fromRGB(100, 0, 0)
+    RemoveButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    RemoveButton.Font = Enum.Font.GothamBold
+    RemoveButton.TextSize = 14
+    RemoveButton.Text = "REMOVE"
+    RemoveButton.Parent = WhitelistFrame
+
+    local RemoveButtonCorner = Instance.new("UICorner")
+    RemoveButtonCorner.CornerRadius = UDim.new(0, 5)
+    RemoveButtonCorner.Parent = RemoveButton
+
+    -- Close button
+    local CloseButton = Instance.new("TextButton")
+    CloseButton.Size = UDim2.new(1, -20, 0, 30)
+    CloseButton.Position = UDim2.new(0, 10, 0, 470)
+    CloseButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    CloseButton.Font = Enum.Font.GothamBold
+    CloseButton.TextSize = 14
+    CloseButton.Text = "CLOSE"
+    CloseButton.Parent = WhitelistFrame
+
+    local CloseButtonCorner = Instance.new("UICorner")
+    CloseButtonCorner.CornerRadius = UDim.new(0, 5)
+    CloseButtonCorner.Parent = CloseButton
+
+    -- Update player lists
+    local function updatePlayerLists()
+        -- Clear existing lists
+        for _, child in ipairs(PlayersScroll:GetChildren()) do
+            if child:IsA("TextButton") then
+                child:Destroy()
+            end
+        end
+        
+        for _, child in ipairs(WhitelistScroll:GetChildren()) do
+            if child:IsA("TextButton") then
+                child:Destroy()
+            end
+        end
+        
+        -- Add online players
+        local players = game:GetService("Players"):GetPlayers()
+        for _, player in ipairs(players) do
+            if player.Name ~= Player.Name then
+                local playerButton = Instance.new("TextButton")
+                playerButton.Size = UDim2.new(1, 0, 0, 30)
+                playerButton.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+                playerButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+                playerButton.Font = Enum.Font.Gotham
+                playerButton.TextSize = 12
+                playerButton.Text = player.Name
+                playerButton.AutoButtonColor = false
+                playerButton.Parent = PlayersScroll
+                
+                local playerButtonCorner = Instance.new("UICorner")
+                playerButtonCorner.CornerRadius = UDim.new(0, 3)
+                playerButtonCorner.Parent = playerButton
+                
+                playerButton.MouseButton1Click:Connect(function()
+                    AddInput.Text = player.Name
+                end)
+            end
+        end
+        
+        -- Add whitelisted players
+        for _, whitelistedName in ipairs(WhitelistData.Whitelisted) do
+            local whitelistButton = Instance.new("TextButton")
+            whitelistButton.Size = UDim2.new(1, 0, 0, 30)
+            whitelistButton.BackgroundColor3 = Color3.fromRGB(0, 40, 0)
+            whitelistButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+            whitelistButton.Font = Enum.Font.GothamBold
+            whitelistButton.TextSize = 12
+            whitelistButton.Text = whitelistedName
+            whitelistButton.AutoButtonColor = false
+            whitelistButton.Parent = WhitelistScroll
+            
+            local whitelistButtonCorner = Instance.new("UICorner")
+            whitelistButtonCorner.CornerRadius = UDim.new(0, 3)
+            whitelistButtonCorner.Parent = whitelistButton
+            
+            whitelistButton.MouseButton1Click:Connect(function()
+                AddInput.Text = whitelistedName
+            end)
+        end
+        
+        -- Update scroll canvas sizes
+        PlayersScroll.CanvasSize = UDim2.new(0, 0, 0, PlayersLayout.AbsoluteContentSize.Y)
+        WhitelistScroll.CanvasSize = UDim2.new(0, 0, 0, WhitelistLayout.AbsoluteContentSize.Y)
+    end
+    
+    -- Add player to whitelist
+    AddButton.MouseButton1Click:Connect(function()
+        local playerName = AddInput.Text:gsub("%s+", "")
+        if playerName == "" then return end
+        
+        -- Check if already whitelisted
+        for _, name in ipairs(WhitelistData.Whitelisted) do
+            if name:lower() == playerName:lower() then
+                AddInput.Text = "Already whitelisted!"
+                task.wait(1)
+                AddInput.Text = ""
+                return
+            end
+        end
+        
+        -- Add to whitelist
+        table.insert(WhitelistData.Whitelisted, playerName)
+        saveWhitelist()
+        updatePlayerLists()
+        AddInput.Text = "Added "..playerName
+        task.wait(1)
+        AddInput.Text = ""
+    end)
+    
+    -- Remove player from whitelist
+    RemoveButton.MouseButton1Click:Connect(function()
+        local playerName = AddInput.Text:gsub("%s+", "")
+        if playerName == "" then return end
+        
+        -- Find and remove from whitelist
+        for i, name in ipairs(WhitelistData.Whitelisted) do
+            if name:lower() == playerName:lower() then
+                table.remove(WhitelistData.Whitelisted, i)
+                saveWhitelist()
+                updatePlayerLists()
+                AddInput.Text = "Removed "..playerName
+                task.wait(1)
+                AddInput.Text = ""
+                return
+            end
+        end
+        
+        AddInput.Text = "Not in whitelist!"
+        task.wait(1)
+        AddInput.Text = ""
+    end)
+    
+    -- Close whitelist manager
+    CloseButton.MouseButton1Click:Connect(function()
+        WhitelistFrame.Visible = false
+    end)
+    
+    -- Toggle whitelist manager with Y key
+    UIS.InputBegan:Connect(function(input, processed)
+        if not processed and input.KeyCode == Enum.KeyCode.Y then
+            WhitelistFrame.Visible = not WhitelistFrame.Visible
+            if WhitelistFrame.Visible then
+                updatePlayerLists()
+            end
+        end
+    end)
+    
+    -- Initial update
+    updatePlayerLists()
+end
 
 -- Animasyonlu parçacıklar
 local particles = {}
 for i = 1, 5 do
     local particle = Instance.new("Frame")
     particle.Size = UDim2.new(0, math.random(2, 4), 0, math.random(2, 4))
-    particle.BackgroundColor3 = Color3.fromRGB(0, math.random(200, 255), 0)
+    particle.BackgroundColor3 = isAllowed and Color3.fromRGB(0, math.random(200, 255), 0) or Color3.fromRGB(math.random(200, 255), 50, 50)
     particle.BorderSizePixel = 0
     particle.BackgroundTransparency = math.random(50, 80)/100
     particle.Parent = MainFrame
@@ -115,9 +443,16 @@ end)
 local IsActive = false
 
 local function toggle()
+    if not isAllowed then
+        StatusLabel.Text = "NOT WHITELISTED"
+        StatusLabel.TextColor3 = Color3.fromRGB(255, 50, 50)
+        Outline.Color = Color3.fromRGB(255, 50, 50)
+        return
+    end
+    
     IsActive = not IsActive
     StatusLabel.Text = IsActive and "INSTANT E: ACTIVE" or "INSTANT E: OFF [Z]"
-    StatusLabel.TextColor3 = IsActive and Color3.fromRGB(0, 255, 150) or Color3.fromRGB(255, 50, 50)
+    StatusLabel.TextColor3 = IsActive and Color3.fromRGB(0, 255, 150) or Color3.fromRGB(255, 255, 255)
     Outline.Color = StatusLabel.TextColor3
     
     -- Parçacık renklerini değiştir
@@ -138,7 +473,7 @@ end)
 
 -- [] TETİKLEME SİSTEMİ
 PPS.PromptButtonHoldBegan:Connect(function(prompt)
-    if IsActive then
+    if IsActive and isAllowed then
         prompt.HoldDuration = 0
         task.spawn(function()
             prompt:InputHoldBegin()
@@ -151,11 +486,21 @@ PPS.PromptButtonHoldBegan:Connect(function(prompt)
 end)
 
 PPS.PromptShown:Connect(function(prompt)
-    if IsActive then
+    if IsActive and isAllowed then
         prompt.HoldDuration = 0
     end
 end)
 
+-- Show status
+if isOwner then
+    StatusLabel.Text = StatusLabel.Text .. " [OWNER - Y]"
+    print("[DinoScripts] Owner mode activated - Press Y for whitelist manager")
+elseif isAllowed then
+    print("[DinoScripts] Whitelisted access granted")
+else
+    print("[DinoScripts] Not whitelisted - Contact Petcenneti_X")
+end
+
 print("[Dino AutoGrab] Instant E tetikleyici yüklendi!")
 print("[Dino AutoGrab] Z tuşu ile aç/kapat")
-print("[DINO UI] Animasyonlu arayüz aktif")
+print("[DINO UI] Whitelist sistemi aktif")
