@@ -39,7 +39,7 @@ Title.BackgroundTransparency = 1
 Title.Text = "Dino AutoGrab INSTANT E"
 Title.TextColor3 = Color3.fromRGB(0, 255, 0)
 Title.Font = Enum.Font.GothamBlack
-Title.TextSize = 16
+Title.TextSize = 30
 Title.TextXAlignment = Enum.TextXAlignment.Left
 Title.Parent = MainFrame
 
