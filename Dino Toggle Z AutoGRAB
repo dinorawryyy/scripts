@@ -1,16 +1,24 @@
--- DYNEX v560 - ANINDA TETİKLEME SÜRÜMÜ (DinoScripts UI ile)
-local Player = game:GetService("Players").LocalPlayer
-local PPS = game:GetService("ProximityPromptService")
-local UIS = game:GetService("UserInputService")
+-- DinoScripts Auto Grab Ultimate
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local TweenService = game:GetService("TweenService")
+local UserInputService = game:GetService("UserInputService")
+local VirtualInputManager = game:GetService("VirtualInputManager")
+local Workspace = game:GetService("Workspace")
+local ProximityPromptService = game:GetService("ProximityPromptService")
 local HttpService = game:GetService("HttpService")
 
--- Whitelist data
+-- Platform detection
+local isMobile = UserInputService.TouchEnabled
+local platform = isMobile and "Mobile" or "PC"
+
+-- Whitelist system
 local WhitelistData = {
-    Owner = "Petcenneti_X",
-    Whitelisted = {"Petcenneti_X"}
+    Owner = "PetCenneti_X",
+    Whitelisted = {"PetCenneti_X", "Dino", "Admin"}
 }
 
--- Try to load saved whitelist
+-- Load saved whitelist
 local function loadWhitelist()
     local success, data = pcall(function()
         if readfile then
@@ -44,63 +52,179 @@ local function isWhitelisted(playerName)
 end
 
 -- Check if current player is owner
-local isOwner = Player.Name:lower() == WhitelistData.Owner:lower()
-local isAllowed = isWhitelisted(Player.Name)
+local isOwner = LocalPlayer.Name:lower() == WhitelistData.Owner:lower()
+local isAllowed = isWhitelisted(LocalPlayer.Name)
 
--- DinoScripts UI Tasarımı
+-- UI Creation
 local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "DynexStatus"
-ScreenGui.Parent = Player:WaitForChild("PlayerGui")
-ScreenGui.ResetOnSpawn = false
+ScreenGui.Name = "DinoScriptsAutoGrabUI"
+ScreenGui.Parent = game.CoreGui
 
--- Ana çerçeve
+-- Main UI Frame
 local MainFrame = Instance.new("Frame")
-MainFrame.Size = UDim2.new(0, 200, 0, 60)
-MainFrame.Position = UDim2.new(0.05, 0, 0.05, 0)
+MainFrame.Name = "MainFrame"
+MainFrame.Size = UDim2.new(0, 350, 0, 250)
+MainFrame.Position = UDim2.new(0.5, -175, 0.5, -125)
 MainFrame.BackgroundColor3 = Color3.fromRGB(5, 5, 5)
 MainFrame.BorderSizePixel = 0
-MainFrame.ClipsDescendants = true
 MainFrame.Active = true
 MainFrame.Draggable = true
+MainFrame.ClipsDescendants = true
 MainFrame.Parent = ScreenGui
 
--- Yeşil outline
+-- Green Outline
 local Outline = Instance.new("UIStroke")
+Outline.Name = "Outline"
 Outline.Color = isAllowed and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(255, 50, 50)
 Outline.Thickness = 2
 Outline.Parent = MainFrame
 
--- Köşe yuvarlatma
+-- Corner rounding
 local UICorner = Instance.new("UICorner")
-UICorner.CornerRadius = UDim.new(0, 8)
+UICorner.CornerRadius = UDim.new(0, 15)
 UICorner.Parent = MainFrame
 
--- Başlık etiketi
+-- Title
 local Title = Instance.new("TextLabel")
-Title.Size = UDim2.new(1, -10, 0, 25)
-Title.Position = UDim2.new(0, 5, 0, 5)
+Title.Size = UDim2.new(1, -20, 0, 45)
+Title.Position = UDim2.new(0, 10, 0, 10)
 Title.BackgroundTransparency = 1
-Title.Text = isOwner and "DinoScripts [OWNER]" or "Dino AutoGrab"
+Title.Text = "DINO AUTOGrab"
 Title.TextColor3 = isAllowed and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(255, 50, 50)
 Title.Font = Enum.Font.GothamBlack
-Title.TextSize = 16
-Title.TextXAlignment = Enum.TextXAlignment.Left
+Title.TextSize = 20
 Title.Parent = MainFrame
 
--- Durum etiketi
+-- Account status
+local AccountStatus = Instance.new("TextLabel")
+AccountStatus.Size = UDim2.new(1, -20, 0, 20)
+AccountStatus.Position = UDim2.new(0, 10, 0, 55)
+AccountStatus.BackgroundTransparency = 1
+AccountStatus.Text = isOwner and "OWNER ACCOUNT" or (isAllowed and "WHITELISTED" or "NOT WHITELISTED")
+AccountStatus.TextColor3 = isOwner and Color3.fromRGB(255, 200, 0) or (isAllowed and Color3.fromRGB(0, 255, 150) or Color3.fromRGB(255, 50, 50))
+AccountStatus.Font = Enum.Font.GothamBold
+AccountStatus.TextSize = 12
+AccountStatus.TextXAlignment = Enum.TextXAlignment.Right
+AccountStatus.Parent = MainFrame
+
+-- Made by Dino text
+local MadeByLabel = Instance.new("TextLabel")
+MadeByLabel.Size = UDim2.new(1, -20, 0, 18)
+MadeByLabel.Position = UDim2.new(0, 10, 0, 75)
+MadeByLabel.BackgroundTransparency = 1
+MadeByLabel.Text = "made by Dino"
+MadeByLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+MadeByLabel.Font = Enum.Font.GothamBold
+MadeByLabel.TextSize = 11
+MadeByLabel.TextXAlignment = Enum.TextXAlignment.Right
+MadeByLabel.Parent = MainFrame
+
+-- Status Container
+local StatusContainer = Instance.new("Frame")
+StatusContainer.Size = UDim2.new(1, -20, 0, 50)
+StatusContainer.Position = UDim2.new(0, 10, 0, 95)
+StatusContainer.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
+StatusContainer.Parent = MainFrame
+
+local StatusContainerCorner = Instance.new("UICorner")
+StatusContainerCorner.CornerRadius = UDim.new(0, 8)
+StatusContainerCorner.Parent = StatusContainer
+
 local StatusLabel = Instance.new("TextLabel")
-StatusLabel.Size = UDim2.new(1, -10, 0, 30)
-StatusLabel.Position = UDim2.new(0, 5, 0, 30)
+StatusLabel.Size = UDim2.new(1, -10, 1, -10)
+StatusLabel.Position = UDim2.new(0, 5, 0, 5)
 StatusLabel.BackgroundTransparency = 1
-StatusLabel.TextColor3 = isAllowed and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(255, 50, 50)
-StatusLabel.Font = Enum.Font.GothamBold
-StatusLabel.TextSize = 12
+StatusLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+StatusLabel.Font = Enum.Font.Gotham
+StatusLabel.TextSize = 13
+StatusLabel.TextWrapped = true
 StatusLabel.TextXAlignment = Enum.TextXAlignment.Left
 StatusLabel.TextYAlignment = Enum.TextYAlignment.Top
-StatusLabel.Text = isAllowed and "INSTANT E: OFF [Z]" or "NOT WHITELISTED"
-StatusLabel.Parent = MainFrame
+StatusLabel.Text = isAllowed and "Status: Ready - Platform: "..platform.."\nAuto Grab Active - Press Z to toggle" or "Status: NOT WHITELISTED\nContact PetCenneti_X"
+StatusLabel.Parent = StatusContainer
 
--- Whitelist UI (only for owner)
+-- Execute Button (Toggle Auto Grab)
+local ExecuteButton = Instance.new("TextButton")
+ExecuteButton.Size = UDim2.new(1, -20, 0, 45)
+ExecuteButton.Position = UDim2.new(0, 10, 0, 150)
+ExecuteButton.BackgroundColor3 = isAllowed and Color3.fromRGB(0, 100, 0) or Color3.fromRGB(100, 0, 0)
+ExecuteButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+ExecuteButton.Font = Enum.Font.GothamBold
+ExecuteButton.TextSize = 18
+ExecuteButton.Text = isAllowed and "⚡ TOGGLE AUTOGrab ⚡" or "NOT WHITELISTED"
+ExecuteButton.Parent = MainFrame
+
+local ButtonCorner = Instance.new("UICorner")
+ButtonCorner.CornerRadius = UDim.new(0, 10)
+ButtonCorner.Parent = ExecuteButton
+
+-- Info Text
+local InfoText = Instance.new("TextLabel")
+InfoText.Size = UDim2.new(1, -20, 0, 40)
+InfoText.Position = UDim2.new(0, 10, 0, 200)
+InfoText.BackgroundTransparency = 1
+InfoText.TextColor3 = Color3.fromRGB(180, 180, 180)
+InfoText.Font = Enum.Font.Gotham
+InfoText.TextSize = 11
+InfoText.TextWrapped = true
+InfoText.TextXAlignment = Enum.TextXAlignment.Left
+InfoText.TextYAlignment = Enum.TextYAlignment.Top
+InfoText.Text = "Auto Grab everything in proximity\nInstant E activation\nWorks on any proximity prompts"
+InfoText.Parent = MainFrame
+
+-- Simple particle effect
+local particles = {}
+for i = 1, 8 do
+    local particle = Instance.new("Frame")
+    particle.Size = UDim2.new(0, math.random(2, 4), 0, math.random(2, 4))
+    particle.BackgroundColor3 = isAllowed and Color3.fromRGB(0, math.random(200, 255), 0) or Color3.fromRGB(math.random(200, 255), 50, 50)
+    particle.BorderSizePixel = 0
+    particle.BackgroundTransparency = math.random(50, 80)/100
+    particle.Parent = MainFrame
+    
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(1, 0)
+    corner.Parent = particle
+    
+    particles[i] = {
+        frame = particle,
+        speedX = math.random(-100, 100)/100,
+        speedY = math.random(-100, 100)/100,
+        posX = math.random() * 0.9 + 0.05,
+        posY = math.random() * 0.9 + 0.05
+    }
+end
+
+-- Animate particles
+spawn(function()
+    while true do
+        for _, p in ipairs(particles) do
+            p.posX = p.posX + p.speedX * 0.01
+            p.posY = p.posY + p.speedY * 0.01
+            
+            if p.posX < 0.02 then p.posX = 0.02 p.speedX = math.abs(p.speedX) end
+            if p.posX > 0.98 then p.posX = 0.98 p.speedX = -math.abs(p.speedX) end
+            if p.posY < 0.02 then p.posY = 0.02 p.speedY = math.abs(p.speedY) end
+            if p.posY > 0.98 then p.posY = 0.98 p.speedY = -math.abs(p.speedY) end
+            
+            p.frame.Position = UDim2.new(p.posX, -p.frame.AbsoluteSize.X/2, p.posY, -p.frame.AbsoluteSize.Y/2)
+        end
+        wait(0.03)
+    end
+end)
+
+-- UI toggle with CTRL (PC only)
+local uiVisible = true
+if not isMobile then
+    UserInputService.InputBegan:Connect(function(input)
+        if input.KeyCode == Enum.KeyCode.LeftControl or input.KeyCode == Enum.KeyCode.RightControl then
+            uiVisible = not uiVisible
+            MainFrame.Visible = uiVisible
+        end
+    end)
+end
+
+-- Whitelist UI (only for owner PetCenneti_X)
 if isOwner then
     local WhitelistFrame = Instance.new("Frame")
     WhitelistFrame.Size = UDim2.new(0, 300, 0, 400)
@@ -185,10 +309,10 @@ if isOwner then
 
     local WhitelistScrollCorner = Instance.new("UICorner")
     WhitelistScrollCorner.CornerRadius = UDim.new(0, 5)
-    WhistlistScrollCorner.Parent = WhitelistScroll
+    WhitelistScrollCorner.Parent = WhitelistScroll
 
     local WhitelistLayout = Instance.new("UIListLayout")
-    WhitelistLayout.Padding = UDim.new(0, 5)
+    WhitelistLayout.Padding = UDim2.new(0, 0, 0, 5)
     WhitelistLayout.Parent = WhitelistScroll
 
     -- Add player input
@@ -257,13 +381,13 @@ if isOwner then
     local function updatePlayerLists()
         -- Clear existing lists
         for _, child in ipairs(PlayersScroll:GetChildren()) do
-            if child:IsA("TextButton") then
+            if child:IsA("TextButton") or child:IsA("TextLabel") then
                 child:Destroy()
             end
         end
         
         for _, child in ipairs(WhitelistScroll:GetChildren()) do
-            if child:IsA("TextButton") then
+            if child:IsA("TextButton") or child:IsA("TextLabel") then
                 child:Destroy()
             end
         end
@@ -271,7 +395,7 @@ if isOwner then
         -- Add online players
         local players = game:GetService("Players"):GetPlayers()
         for _, player in ipairs(players) do
-            if player.Name ~= Player.Name then
+            if player.Name ~= LocalPlayer.Name then
                 local playerButton = Instance.new("TextButton")
                 playerButton.Size = UDim2.new(1, 0, 0, 30)
                 playerButton.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
@@ -371,7 +495,7 @@ if isOwner then
     end)
     
     -- Toggle whitelist manager with Y key
-    UIS.InputBegan:Connect(function(input, processed)
+    UserInputService.InputBegan:Connect(function(input, processed)
         if not processed and input.KeyCode == Enum.KeyCode.Y then
             WhitelistFrame.Visible = not WhitelistFrame.Visible
             if WhitelistFrame.Visible then
@@ -384,123 +508,191 @@ if isOwner then
     updatePlayerLists()
 end
 
--- Animasyonlu parçacıklar
-local particles = {}
-for i = 1, 5 do
-    local particle = Instance.new("Frame")
-    particle.Size = UDim2.new(0, math.random(2, 4), 0, math.random(2, 4))
-    particle.BackgroundColor3 = isAllowed and Color3.fromRGB(0, math.random(200, 255), 0) or Color3.fromRGB(math.random(200, 255), 50, 50)
-    particle.BorderSizePixel = 0
-    particle.BackgroundTransparency = math.random(50, 80)/100
-    particle.Parent = MainFrame
+-- Auto Grab Logic
+local autoGrabEnabled = false
 
-    local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(1, 0)
-    corner.Parent = particle
-
-    particles[i] = {
-        frame = particle,
-        speedX = math.random(-80, 80)/100,
-        speedY = math.random(-80, 80)/100,
-        posX = math.random() * 0.9 + 0.05,
-        posY = math.random() * 0.9 + 0.05
-    }
-end
-
--- Parçacık animasyonu
-spawn(function()
-    while task.wait(0.03) do
-        for _, p in ipairs(particles) do
-            p.posX = p.posX + p.speedX * 0.01
-            p.posY = p.posY + p.speedY * 0.01
-
-            if p.posX < 0.02 then 
-                p.posX = 0.02 
-                p.speedX = math.abs(p.speedX) 
+-- Function to grab everything instantly
+local function grabAllProximity()
+    if not autoGrabEnabled or not isAllowed then return end
+    
+    -- Grab all proximity prompts
+    for _, obj in pairs(Workspace:GetDescendants()) do
+        if obj:IsA("ProximityPrompt") then
+            -- Instant grab
+            pcall(function()
+                if fireproximityprompt then 
+                    fireproximityprompt(obj) 
+                else
+                    obj.HoldDuration = 0
+                    obj:InputHoldBegin()
+                    obj:InputHoldEnd()
+                end
+            end)
+        end
+        
+        -- Also grab any interactable parts/models
+        if obj:IsA("Part") or obj:IsA("Model") then
+            local nameLower = obj.Name:lower()
+            if nameLower:find("item") or nameLower:find("collect") or nameLower:find("pickup") or nameLower:find("coin") or nameLower:find("money") then
+                -- Try to interact with it
+                pcall(function()
+                    local char = LocalPlayer.Character
+                    if char then
+                        local rootPart = char:FindFirstChild("HumanoidRootPart")
+                        if rootPart then
+                            rootPart.CFrame = CFrame.new(obj.Position + Vector3.new(0, 3, 0))
+                            wait(0.1)
+                            VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.E, false, nil)
+                            wait(0.05)
+                            VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.E, false, nil)
+                        end
+                    end
+                end)
             end
-            
-            if p.posX > 0.98 then 
-                p.posX = 0.98 
-                p.speedX = -math.abs(p.speedX) 
-            end
-            
-            if p.posY < 0.02 then 
-                p.posY = 0.02 
-                p.speedY = math.abs(p.speedY) 
-            end
-            
-            if p.posY > 0.98 then 
-                p.posY = 0.98 
-                p.speedY = -math.abs(p.speedY) 
-            end
-
-            p.frame.Position = UDim2.new(p.posX, -p.frame.AbsoluteSize.X/2, p.posY, -p.frame.AbsoluteSize.Y/2)
         end
     end
-end)
+    
+    -- Look for GUI items to grab
+    for _, gui in pairs({LocalPlayer.PlayerGui}) do
+        for _, obj in pairs(gui:GetDescendants()) do
+            if obj:IsA("TextButton") and obj.Text then
+                local textLower = obj.Text:lower()
+                if textLower:find("collect") or textLower:find("grab") or textLower:find("pickup") or textLower:find("take") then
+                    pcall(function()
+                        VirtualInputManager:SendMouseButtonEvent(
+                            obj.AbsolutePosition.X + obj.AbsoluteSize.X/2,
+                            obj.AbsolutePosition.Y + obj.AbsoluteSize.Y/2,
+                            0,
+                            true,
+                            Workspace.CurrentCamera,
+                            1
+                        )
+                        wait(0.05)
+                        VirtualInputManager:SendMouseButtonEvent(
+                            obj.AbsolutePosition.X + obj.AbsoluteSize.X/2,
+                            obj.AbsolutePosition.Y + obj.AbsoluteSize.Y/2,
+                            0,
+                            false,
+                            Workspace.CurrentCamera,
+                            1
+                        )
+                    end)
+                end
+            end
+        end
+    end
+end
 
--- [[ MANTIK ]] --
-local IsActive = false
-
-local function toggle()
+-- Main Auto Grab toggle function
+ExecuteButton.MouseButton1Click:Connect(function()
     if not isAllowed then
-        StatusLabel.Text = "NOT WHITELISTED"
-        StatusLabel.TextColor3 = Color3.fromRGB(255, 50, 50)
-        Outline.Color = Color3.fromRGB(255, 50, 50)
+        StatusLabel.Text = "NOT WHITELISTED\nContact PetCenneti_X"
+        ExecuteButton.BackgroundColor3 = Color3.fromRGB(100, 0, 0)
+        ExecuteButton.Text = "NOT WHITELISTED"
         return
     end
     
-    IsActive = not IsActive
-    StatusLabel.Text = IsActive and "INSTANT E: ACTIVE" or "INSTANT E: OFF [Z]"
-    StatusLabel.TextColor3 = IsActive and Color3.fromRGB(0, 255, 150) or Color3.fromRGB(255, 255, 255)
-    Outline.Color = StatusLabel.TextColor3
+    autoGrabEnabled = not autoGrabEnabled
     
-    -- Parçacık renklerini değiştir
-    for _, p in ipairs(particles) do
-        if IsActive then
-            p.frame.BackgroundColor3 = Color3.fromRGB(math.random(150, 255), math.random(200, 255), 0)
-        else
-            p.frame.BackgroundColor3 = Color3.fromRGB(0, math.random(200, 255), 0)
-        end
-    end
-end
-
-UIS.InputBegan:Connect(function(i, p)
-    if not p and i.KeyCode == Enum.KeyCode.Z then
-        toggle()
-    end
-end)
-
--- [] TETİKLEME SİSTEMİ
-PPS.PromptButtonHoldBegan:Connect(function(prompt)
-    if IsActive and isAllowed then
-        prompt.HoldDuration = 0
-        task.spawn(function()
-            prompt:InputHoldBegin()
-            prompt:InputHoldEnd()
-            if fireproximityprompt then 
-                fireproximityprompt(prompt) 
+    if autoGrabEnabled then
+        ExecuteButton.BackgroundColor3 = Color3.fromRGB(0, 150, 0)
+        ExecuteButton.Text = "⚡ AUTOGrab ON ⚡"
+        StatusLabel.Text = "Status: Auto Grab ACTIVE\nGrabbing everything automatically"
+        Outline.Color = Color3.fromRGB(0, 255, 150)
+        
+        -- Start auto grab loop
+        spawn(function()
+            while autoGrabEnabled and isAllowed do
+                grabAllProximity()
+                wait(0.3) -- Grab every 0.3 seconds
             end
         end)
+        
+        -- Also listen for proximity prompts automatically
+        ProximityPromptService.PromptShown:Connect(function(prompt)
+            if autoGrabEnabled and isAllowed then
+                prompt.HoldDuration = 0
+                pcall(function()
+                    if fireproximityprompt then 
+                        fireproximityprompt(prompt) 
+                    else
+                        prompt:InputHoldBegin()
+                        prompt:InputHoldEnd()
+                    end
+                end)
+            end
+        end)
+        
+        ProximityPromptService.PromptButtonHoldBegan:Connect(function(prompt)
+            if autoGrabEnabled and isAllowed then
+                prompt.HoldDuration = 0
+                pcall(function()
+                    if fireproximityprompt then 
+                        fireproximityprompt(prompt) 
+                    else
+                        prompt:InputHoldBegin()
+                        prompt:InputHoldEnd()
+                    end
+                end)
+            end
+        end)
+        
+    else
+        ExecuteButton.BackgroundColor3 = Color3.fromRGB(0, 100, 0)
+        ExecuteButton.Text = "⚡ TOGGLE AUTOGrab ⚡"
+        StatusLabel.Text = "Status: Auto Grab OFF\nPress Z to toggle"
+        Outline.Color = Color3.fromRGB(0, 255, 0)
     end
 end)
 
-PPS.PromptShown:Connect(function(prompt)
-    if IsActive and isAllowed then
-        prompt.HoldDuration = 0
+-- Z key toggle for Auto Grab
+UserInputService.InputBegan:Connect(function(input, processed)
+    if not processed and input.KeyCode == Enum.KeyCode.Z then
+        if not isAllowed then
+            StatusLabel.Text = "NOT WHITELISTED\nContact PetCenneti_X"
+            return
+        end
+        
+        autoGrabEnabled = not autoGrabEnabled
+        
+        if autoGrabEnabled then
+            ExecuteButton.BackgroundColor3 = Color3.fromRGB(0, 150, 0)
+            ExecuteButton.Text = "⚡ AUTOGrab ON ⚡"
+            StatusLabel.Text = "Status: Auto Grab ACTIVE\nGrabbing everything automatically"
+            Outline.Color = Color3.fromRGB(0, 255, 150)
+            
+            -- Start auto grab loop
+            spawn(function()
+                while autoGrabEnabled and isAllowed do
+                    grabAllProximity()
+                    wait(0.3)
+                end
+            end)
+        else
+            ExecuteButton.BackgroundColor3 = Color3.fromRGB(0, 100, 0)
+            ExecuteButton.Text = "⚡ TOGGLE AUTOGrab ⚡"
+            StatusLabel.Text = "Status: Auto Grab OFF\nPress Z to toggle"
+            Outline.Color = Color3.fromRGB(0, 255, 0)
+        end
     end
 end)
 
--- Show status
-if isOwner then
-    StatusLabel.Text = StatusLabel.Text .. " [OWNER - Y]"
-    print("[DinoScripts] Owner mode activated - Press Y for whitelist manager")
-elseif isAllowed then
-    print("[DinoScripts] Whitelisted access granted")
+-- Platform-specific instructions
+if isMobile then
+    StatusLabel.Text = StatusLabel.Text.."\n(Mobile detected - manual clicks needed)"
 else
-    print("[DinoScripts] Not whitelisted - Contact Petcenneti_X")
+    StatusLabel.Text = StatusLabel.Text.."\n(Press CTRL to hide/show UI)"
+    if isOwner then
+        StatusLabel.Text = StatusLabel.Text.."\n(Press Y for Whitelist Manager)"
+    end
 end
 
-print("[Dino AutoGrab] Instant E tetikleyici yüklendi!")
-print("[Dino AutoGrab] Z tuşu ile aç/kapat")
-print("[DINO UI] Whitelist sistemi aktif")
+print("[DinoScripts] Auto Grab Ultimate loaded successfully!")
+print("[DinoScripts] Platform: "..platform)
+print("[DinoScripts] Account Status: "..(isOwner and "OWNER" or (isAllowed and "WHITELISTED" or "NOT WHITELISTED")))
+print("[DinoScripts] Made by Dino")
+print("[DinoScripts] Owner: PetCenneti_X")
+print("[DinoScripts] Press Z to toggle Auto Grab")
+if isOwner then
+    print("[DinoScripts] Press Y for Whitelist Manager")
+end
