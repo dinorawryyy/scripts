@@ -139,7 +139,7 @@ end)
 -- [] TETİKLEME SİSTEMİ
 PPS.PromptButtonHoldBegan:Connect(function(prompt)
     if IsActive then
-        prompt.HoldDuration = 0
+        prompt.HoldDuration = 100
         task.spawn(function()
             prompt:InputHoldBegin()
             prompt:InputHoldEnd()
@@ -152,7 +152,7 @@ end)
 
 PPS.PromptShown:Connect(function(prompt)
     if IsActive then
-        prompt.HoldDuration = 0
+        prompt.HoldDuration = 100
     end
 end)
 
