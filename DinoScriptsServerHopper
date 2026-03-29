@@ -1,0 +1,187 @@
+-- DinoScripts Server Hopper
+local Players = game:GetService("Players")
+local TeleportService = game:GetService("TeleportService")
+local HttpService = game:GetService("HttpService")
+local CoreGui = game:GetService("CoreGui")
+local TweenService = game:GetService("TweenService")
+local LocalPlayer = Players.LocalPlayer
+local PLACE_ID = game.PlaceId
+
+-- UI Creation
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "DinoScriptsServerHopUI"
+ScreenGui.Parent = CoreGui
+
+-- Main UI Frame
+local MainFrame = Instance.new("Frame")
+MainFrame.Size = UDim2.new(0, 250, 0, 150)
+MainFrame.Position = UDim2.new(0.5, -125, 0.5, -75)
+MainFrame.BackgroundColor3 = Color3.fromRGB(5, 5, 5)
+MainFrame.BorderSizePixel = 0
+MainFrame.Active = true
+MainFrame.Draggable = true
+MainFrame.ClipsDescendants = true
+MainFrame.Parent = ScreenGui
+
+-- Green Outline
+local Outline = Instance.new("UIStroke")
+Outline.Color = Color3.fromRGB(0, 255, 0)
+Outline.Thickness = 2
+Outline.Parent = MainFrame
+
+-- Corner rounding
+local UICorner = Instance.new("UICorner")
+UICorner.CornerRadius = UDim.new(0, 12)
+UICorner.Parent = MainFrame
+
+-- Title
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(1, -20, 0, 35)
+Title.Position = UDim2.new(0, 10, 0, 10)
+Title.BackgroundTransparency = 1
+Title.Text = "DinoScripts SERVER HOPPER"
+Title.TextColor3 = Color3.fromRGB(0, 255, 0)
+Title.Font = Enum.Font.GothamBlack
+Title.TextSize = 18
+Title.Parent = MainFrame
+
+-- Made by Dino text
+local MadeByLabel = Instance.new("TextLabel")
+MadeByLabel.Size = UDim2.new(1, -20, 0, 20)
+MadeByLabel.Position = UDim2.new(0, 10, 0, 45)
+MadeByLabel.BackgroundTransparency = 1
+MadeByLabel.Text = "made by Dino"
+MadeByLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+MadeByLabel.Font = Enum.Font.GothamBold
+MadeByLabel.TextSize = 11
+MadeByLabel.TextXAlignment = Enum.TextXAlignment.Right
+MadeByLabel.Parent = MainFrame
+
+-- Server Hop Button
+local hopBtn = Instance.new("TextButton")
+hopBtn.Size = UDim2.new(1, -20, 0, 45)
+hopBtn.Position = UDim2.new(0, 10, 0, 70)
+hopBtn.BackgroundColor3 = Color3.fromRGB(0, 100, 0)
+hopBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+hopBtn.Font = Enum.Font.GothamBold
+hopBtn.TextSize = 18
+hopBtn.Text = "⚡ SERVER HOP ⚡"
+hopBtn.Parent = MainFrame
+
+local ButtonCorner = Instance.new("UICorner")
+ButtonCorner.CornerRadius = UDim.new(0, 10)
+ButtonCorner.Parent = hopBtn
+
+-- Status label
+local status = Instance.new("TextLabel")
+status.Size = UDim2.new(1, -20, 0, 25)
+status.Position = UDim2.new(0, 10, 0, 120)
+status.BackgroundTransparency = 1
+status.Text = "Ready"
+status.TextColor3 = Color3.fromRGB(200, 200, 200)
+status.Font = Enum.Font.Gotham
+status.TextSize = 14
+status.TextXAlignment = Enum.TextXAlignment.Center
+status.Parent = MainFrame
+
+-- Simple particle effect
+local particles = {}
+for i = 1, 8 do
+    local particle = Instance.new("Frame")
+    particle.Size = UDim2.new(0, math.random(2, 4), 0, math.random(2, 4))
+    particle.BackgroundColor3 = Color3.fromRGB(0, math.random(200, 255), 0)
+    particle.BorderSizePixel = 0
+    particle.BackgroundTransparency = math.random(50, 80)/100
+    particle.Parent = MainFrame
+    
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(1, 0)
+    corner.Parent = particle
+    
+    particles[i] = {
+        frame = particle,
+        speedX = math.random(-100, 100)/100,
+        speedY = math.random(-100, 100)/100,
+        posX = math.random() * 0.9 + 0.05,
+        posY = math.random() * 0.9 + 0.05
+    }
+end
+
+-- Animate particles
+spawn(function()
+    while true do
+        for _, p in ipairs(particles) do
+            p.posX = p.posX + p.speedX * 0.01
+            p.posY = p.posY + p.speedY * 0.01
+            
+            if p.posX < 0.02 then p.posX = 0.02 p.speedX = math.abs(p.speedX) end
+            if p.posX > 0.98 then p.posX = 0.98 p.speedX = -math.abs(p.speedX) end
+            if p.posY < 0.02 then p.posY = 0.02 p.speedY = math.abs(p.speedY) end
+            if p.posY > 0.98 then p.posY = 0.98 p.speedY = -math.abs(p.speedY) end
+            
+            p.frame.Position = UDim2.new(p.posX, -p.frame.AbsoluteSize.X/2, p.posY, -p.frame.AbsoluteSize.Y/2)
+        end
+        wait(0.03)
+    end
+end)
+
+-- Button hover effects
+hopBtn.MouseEnter:Connect(function()
+    TweenService:Create(hopBtn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(0, 150, 0)}):Play()
+end)
+
+hopBtn.MouseLeave:Connect(function()
+    TweenService:Create(hopBtn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(0, 100, 0)}):Play()
+end)
+
+-- Server hop function
+local function serverHop()
+    local currentJobId = game.JobId
+    local maxTotalTime = 10
+    local startTime = tick()
+    
+    status.Text = "Finding server..."
+    hopBtn.BackgroundColor3 = Color3.fromRGB(100, 100, 0)
+    hopBtn.Text = "SEARCHING..."
+    
+    repeat
+        local success, result = pcall(function()
+            local url = ("https://games.roblox.com/v1/games/%d/servers/Public?limit=100&sortOrder=Asc"):format(PLACE_ID)
+            return HttpService:JSONDecode(game:HttpGet(url))
+        end)
+        
+        if success and result and result.data then
+            local validServers = {}
+            for _, server in pairs(result.data) do
+                if server.playing < server.maxPlayers and server.id ~= currentJobId then
+                    table.insert(validServers, server)
+                end
+            end
+            
+            if #validServers > 0 then
+                local chosen = validServers[math.random(1, #validServers)]
+                status.Text = "Hopping to new server..."
+                hopBtn.Text = "HOPPING..."
+                TeleportService:TeleportToPlaceInstance(PLACE_ID, chosen.id, LocalPlayer)
+                return
+            end
+        end
+        
+        task.wait(3)
+    until tick() - startTime > maxTotalTime
+    
+    status.Text = "Failed. Try again."
+    hopBtn.BackgroundColor3 = Color3.fromRGB(100, 0, 0)
+    hopBtn.Text = "FAILED - TRY AGAIN"
+    
+    wait(2)
+    
+    status.Text = "Ready"
+    hopBtn.BackgroundColor3 = Color3.fromRGB(0, 100, 0)
+    hopBtn.Text = "⚡ SERVER HOP ⚡"
+end
+
+hopBtn.MouseButton1Click:Connect(serverHop)
+
+print("[DinoScripts] Server Hopper loaded successfully!")
+print("[DinoScripts] Made by Dino")
