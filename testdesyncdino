@@ -1,4 +1,4 @@
--- Dino DESYNC (High-Vis Solid Neon & Raknet Optimized)
+-- Dino DESYNC (Local Anims ON / Server Anims OFF)
 local player = game.Players.LocalPlayer
 local RunService = game:GetService("RunService")
 
@@ -7,17 +7,14 @@ local function getHumanoid()
     return char:WaitForChild("Humanoid")
 end
 
-local humanoid = getHumanoid()
-
--- UI Initialization
+-- UI Setup
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "DinoDesyncGui"
 ScreenGui.Parent = player:WaitForChild("PlayerGui")
 ScreenGui.ResetOnSpawn = false
 
--- Main Frame
 local MainFrame = Instance.new("Frame")
-MainFrame.Size = UDim2.new(0, 220, 0, 80) -- Slightly smaller for performance
+MainFrame.Size = UDim2.new(0, 220, 0, 80)
 MainFrame.Position = UDim2.new(0.5, -110, 0.5, -40)
 MainFrame.BackgroundColor3 = Color3.fromRGB(5, 5, 5)
 MainFrame.BorderSizePixel = 0
@@ -69,11 +66,10 @@ ButtonCorner.CornerRadius = UDim.new(0, 6)
 ButtonCorner.Parent = ToggleButton
 
 -----------------------------------------------------------
--- CORE GHOST & OPTIMIZED RAKNET LOGIC
+-- CORE LOGIC: GHOSTING & RAKNET
 -----------------------------------------------------------
 local enabled = false
 local ghostModel = nil
-local animConnection
 
 local function removeGhost()
     if ghostModel then 
@@ -92,38 +88,36 @@ local function createGhost()
     ghostModel.Name = "Dino_Visual_Freeze"
     ghostModel.Parent = workspace
     
-    -- Clone character parts + Gears
+    -- Clone parts to show where you are "stuck" for others
     for _, obj in pairs(char:GetDescendants()) do
         if obj:IsA("BasePart") and obj.Transparency < 1 then
-            local ghostPart = Instance.new("Part") -- Create new parts to avoid laggy cloning of huge scripts
-            ghostPart.Size = obj.Size
-            ghostPart.CFrame = obj.CFrame
-            ghostPart.Anchored = true
-            ghostPart.CanCollide = false
-            ghostPart.Parent = ghostModel
-            
-            -- VISIBILITY: Solid Glowing Neon Green
-            ghostPart.Material = Enum.Material.Neon
-            ghostPart.Color = Color3.fromRGB(0, 255, 0) -- Pure Bright Green
-            ghostPart.Transparency = 0.2 -- Just enough to see your real body through it, but very solid
-            
-            -- Handle Head/Accessories Meshes
-            if obj:IsA("MeshPart") or obj:FindFirstChildOfClass("SpecialMesh") then
-                local mesh = obj:FindFirstChildOfClass("SpecialMesh") or obj:Clone()
-                if mesh:IsA("MeshPart") then
-                   -- Handle meshparts by cloning and stripping
-                else
-                   mesh:Clone().Parent = ghostPart
+            local ghostPart = obj:Clone()
+            -- Strip scripts and physics immediately to prevent lag
+            for _, c in pairs(ghostPart:GetDescendants()) do
+                if not c:IsA("SpecialMesh") and not c:IsA("BlockMesh") and not c:IsA("CylinderMesh") then
+                    c:Destroy()
                 end
             end
+            
+            ghostPart.Parent = ghostModel
+            ghostPart.Anchored = true
+            ghostPart.CanCollide = false
+            ghostPart.CanTouch = false
+            ghostPart.CanQuery = false
+            
+            -- HIGH VISIBILITY: Solid Neon Green
+            ghostPart.Material = Enum.Material.Neon
+            ghostPart.Color = Color3.fromRGB(0, 255, 0)
+            ghostPart.Transparency = 0.2 -- Mostly solid
+            
+            -- Snap ghost to your exact position at toggle moment
+            ghostPart.CFrame = obj.CFrame
         end
     end
 end
 
 local function updateState(newState)
     enabled = newState
-    local char = player.Character
-    local hum = char and char:FindFirstChild("Humanoid")
 
     if enabled then
         ToggleButton.BackgroundColor3 = Color3.fromRGB(0, 200, 0)
@@ -132,24 +126,22 @@ local function updateState(newState)
         StatusLabel.TextColor3 = Color3.fromRGB(0, 255, 100)
         Outline.Color = Color3.fromRGB(0, 255, 0)
         
-        -- Lock visual ghost
+        -- Create the solid neon ghost
         createGhost()
 
-        -- RAKNET HOOK (Optimized)
+        -- RAKNET: Freeze traffic to server
+        -- This stops the server from knowing you are moving/animating
         pcall(function()
             if raknet and raknet.desync then 
                 raknet.desync(true) 
             else
-                -- Fallback for environments without raknet
+                -- High-latency fallback if raknet isn't present
                 settings().Network.IncomingReplicationLag = 1000
             end
         end)
-
-        -- Stop Anims to prevent movement lag visual
-        if hum then
-            for _, track in pairs(hum:GetPlayingAnimationTracks()) do track:Stop() end
-            animConnection = hum.AnimationPlayed:Connect(function(t) t:Stop() end)
-        end
+        
+        -- WE DO NOT STOP HUMANOID ANIMATIONS HERE
+        -- You will see yourself walk, but the server won't receive the packets.
     else
         ToggleButton.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
         ToggleButton.Text = "OFF"
@@ -166,8 +158,6 @@ local function updateState(newState)
                 settings().Network.IncomingReplicationLag = 0
             end
         end)
-
-        if animConnection then animConnection:Disconnect() end
     end
 end
 
@@ -175,9 +165,8 @@ ToggleButton.Activated:Connect(function()
     updateState(not enabled)
 end)
 
--- Cleanup on death to prevent "Ghost Stacking"
 player.CharacterAdded:Connect(function()
     if enabled then updateState(false) end
 end)
 
-print("[Dino DESYNC] Optimized Raknet System Loaded")
+print("[Dino DESYNC] Local-Anims Active | Server-Freeze Active")
